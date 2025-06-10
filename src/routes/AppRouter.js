@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoutes from './ProtectedRoutes';
 import PublicRoutes from './PublicRoutes';
 import Home from '../pages/Home';
@@ -8,7 +8,7 @@ import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
 
 const AppRouter = () => (
-  <Router basename="/chart-dashboard">
+  <Router>
     <Routes>
       {/* Public Routes */}
       <Route element={<PublicRoutes />}>
@@ -18,7 +18,6 @@ const AppRouter = () => (
       {/* Protected Routes */}
       <Route element={<ProtectedRoutes />}>
         <Route path="/" element={<Dashboard />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
       </Route>
 
       {/* Fallback */}
