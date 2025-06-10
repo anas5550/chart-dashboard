@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 
 const authenticateUser = async ({ username, password }) => {
   const FAKE_CREDS = {
-    username: 'admin',
+    username: 'admin@dev.com',
     password: '123456',
   };
   return new Promise((resolve, reject) => {
@@ -29,7 +29,7 @@ const Login = () => {
   };
 
   const validationSchema = Yup.object({
-    username: Yup.string().required('Username is required'),
+    username: Yup.string().email().required('Username is required'),
     password: Yup.string().min(6, 'Minimum 6 characters').required('Password is required'),
   });
 
@@ -47,7 +47,8 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">Login</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">Welcome Back</h2>
+        <h2 className="text-xl font-bold mb-6 text-center text-gray-700">Login</h2>
 
         <Formik
           initialValues={initialValues}
@@ -87,13 +88,19 @@ const Login = () => {
                   className="text-sm text-red-500 mt-1"
                 />
               </div>
+              <div className="flex justify-end items-center">
+                <input id="remember-me-checkbox" name="checkbox" type="checkbox" className="mr-1" />
+                <label htmlFor="remember-me-checkbox" className="text-sm font-medium capitalize">
+                  remember me
+                </label>
+              </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
               >
-                {isSubmitting ? 'Logging in...' : 'Login'}
+                {isSubmitting ? 'Logging in...' : 'Sign In'}
               </button>
             </Form>
           )}
