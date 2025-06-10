@@ -1,12 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { days, metrics, darkToLightMetrics } from '../../constants/metricConfig';
-
-const getColor = (value, max, reverse = false) => {
-  const intensity = value / max;
-  const color = reverse ? 255 - intensity * 160 : 255 - (1 - intensity) * 160;
-  return `rgb(255, ${color}, ${color})`;
-};
+import { getColor } from '../../utils/getColor';
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const formatHour = (hour) => {
@@ -19,11 +14,11 @@ const HeatMapTable = ({ data }) => {
   const maxVal = Math.max(...data.map((d) => d.value || 0));
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full h-full my-10 p-4 bg-white shadow rounded">
       <h2 className="text-lg font-semibold mb-4">Heat Map Table</h2>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-6 mb-4">
+      <div className="flex flex-wrap gap-6 mb-4 ">
         <div>
           <div className="font-medium text-sm mb-1">Color Legend (Dark → Light)</div>
           <div className="flex gap-1">
@@ -53,9 +48,8 @@ const HeatMapTable = ({ data }) => {
         </div>
       </div>
 
-      {/* Scrollable Heatmap */}
-      <div className="max-w-screen-md max-h-screen overflow-scroll border rounded">
-        <table className="border-collapse min-w-max text-sm">
+      <div className="max-w-screen-md max-h-screen overflow-scroll border rounded  ">
+        <table className="border-collapse min-w-max text-sm ">
           <thead className="sticky top-0 bg-white z-10">
             <tr>
               <th className="border px-2 py-1 bg-gray-100 sticky left-0 z-20 ">Hour / Metric</th>

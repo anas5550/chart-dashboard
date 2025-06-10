@@ -1,29 +1,36 @@
 export const metricOptions = ['Sales', 'Revenue', 'Growth', 'Clicks'];
 
-export const sineWaveChartData = Array.from({ length: 24 }, (_, i) => {
-  const hour = i;
-  const angle = (hour / 24) * 2 * Math.PI; // Normalize hour to 0-2PI for sine wave
+export const chartData = [
+  { hour: '0Hr', Sales: 24000, Revenue: 18000, Clicks: 100 },
+  { hour: '2Hr', Sales: 22000, Revenue: 16000, Clicks: 90 },
+  { hour: '4Hr', Sales: 20000, Revenue: 14000, Clicks: 80 },
+  { hour: '6Hr', Sales: 18000, Revenue: 12000, Clicks: 70 },
+  { hour: '8Hr', Sales: 16000, Revenue: 10000, Clicks: 60 },
+  { hour: '10Hr', Sales: 12000, Revenue: 8000, Clicks: 50 },
+  { hour: '12Hr', Sales: 0, Revenue: 4000, Clicks: 40 },
+  { hour: '0Hr', Sales: 10000, Revenue: 8000, Clicks: 50 },
+  { hour: '2Hr', Sales: 12000, Revenue: 9500, Clicks: 65 },
+  { hour: '4Hr', Sales: 14000, Revenue: 11000, Clicks: 70 },
+  { hour: '6Hr', Sales: 11000, Revenue: 8500, Clicks: 60 },
+  { hour: '8Hr', Sales: 15000, Revenue: 12000, Clicks: 75 },
+  { hour: '10Hr', Sales: 18000, Revenue: 14000, Clicks: 80 },
+  { hour: '12Hr', Sales: 22000, Revenue: 17000, Clicks: 95 },
+  { hour: '0Hr', Sales: 15000, Revenue: 10000, Clicks: 40 },
+  { hour: '2Hr', Sales: 8000, Revenue: 6000, Clicks: 80 },
+  { hour: '4Hr', Sales: 20000, Revenue: 15000, Clicks: 30 },
+  { hour: '6Hr', Sales: 12000, Revenue: 9000, Clicks: 90 },
+  { hour: '8Hr', Sales: 24000, Revenue: 18000, Clicks: 20 },
+  { hour: '10Hr', Sales: 10000, Revenue: 7500, Clicks: 100 },
+  { hour: '12Hr', Sales: 17000, Revenue: 13000, Clicks: 50 },
+  { hour: '0Hr', Sales: 10000, Revenue: 7000, Clicks: 50 },
+  { hour: '2Hr', Sales: 15000, Revenue: 11000, Clicks: 70 },
+  { hour: '4Hr', Sales: 20000, Revenue: 15000, Clicks: 85 },
+  { hour: '6Hr', Sales: 24000, Revenue: 18000, Clicks: 100 },
+  { hour: '8Hr', Sales: 18000, Revenue: 14000, Clicks: 75 },
+  { hour: '10Hr', Sales: 12000, Revenue: 9000, Clicks: 60 },
+  { hour: '12Hr', Sales: 5000, Revenue: 3000, Clicks: 30 },
+];
 
-  // Sine wave for Sales, peaking around 12-14 hours (midday/early afternoon)
-  const sales = Math.round(15000 + 10000 * Math.sin(angle - Math.PI / 2)); // Shift phase to start high, dip, then peak
-  // Ensure sales don't go below zero
-  const finalSales = Math.max(0, sales);
-
-  // Cosine wave for Revenue, slightly offset from sales, maybe peaking earlier or later
-  const revenue = Math.round(12000 + 8000 * Math.cos(angle - Math.PI / 4)); // Shift phase
-  const finalRevenue = Math.max(0, revenue);
-
-  // More fluctuating data for Clicks
-  const clicks = Math.round(50 + 40 * Math.random() - 20 * Math.sin(angle * 2));
-  const finalClicks = Math.max(10, clicks); // Ensure clicks don't go too low
-
-  return {
-    hour: `${hour}Hr`,
-    Sales: finalSales,
-    Revenue: finalRevenue,
-    Clicks: finalClicks,
-  };
-});
 export const heatMapData = [
   { day: 'Sunday', hour: 0, metric: 'Impressions', value: 120 },
   { day: 'Sunday', hour: 0, metric: 'Clicks', value: 30 },

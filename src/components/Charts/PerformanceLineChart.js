@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { chartLineColors } from './../../utils/chartLineColors';
 import {
   LineChart,
   Line,
@@ -11,39 +12,75 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// Define your colors outside or pass them as a prop if they need to be dynamic
-const colors = ['#8884d8', '#82ca9d', '#ff7300', '#0088FE', '#FF8042', '#d0ed57', '#a4de6c']; // Added more colors for more metrics
-
-// Renamed prop from 'data' to 'chartData' to avoid confusion,
-// but you can keep 'data' if you prefer.
 const PerformanceLineChart = ({ chartData, selectedMetrics }) => {
-  // No need for internal data transformation here, as the input 'chartData'
-  // is already in the correct format for Recharts.
+  // A helper function to format the Y-axis ticks for currency.
+  // It converts large numbers to 'K' (thousands) and adds a rupee symbol.
+  const formatYAxisCurrencyTick = (value) => {
+    if (value === 0) return '₹0';
+    return `₹${(value / 1000).toFixed(1)}K`;
+  };
 
-  // Add console log to ensure data is coming in correctly
-  console.log('PerformanceLineChart received data:', chartData);
-  console.log('PerformanceLineChart received selectedMetrics:', selectedMetrics);
+  // Set the specific range and tick marks for the Y-axis.
+  // This ensures your vertical scale is consistent from 0 to 24000.
+  const yAxisValueDomain = [0, 24000];
+  const yAxisFixedTicks = Array.from({ length: 7 }, (_, index) => 24000 - index * 4000).reverse();
+
+  // --- X-Axis Spreading Logic ---
+  // To spread the hours evenly, we need to treat the X-axis as a numerical scale.
+  // First, we transform the incoming data to include a numeric 'hourValue'.
+  const processedChartData = chartData.map((dataPoint) => ({
+    ...dataPoint,
+    // Convert '0Hr', '2Hr', etc., into actual numbers (0, 2)
+    hourValue: parseInt(dataPoint.hour.replace('Hr', ''), 10),
+  }));
+
+  // Define the numerical points where you want X-axis labels to appear.
+  // This matches your data's hour intervals.
+  const xAxisNumericalTicks = [0, 2, 4, 6, 8, 10, 12];
+
+  // A formatter for X-axis ticks to convert the numerical hour back into '0Hr' string.
+  const formatXAxisHourTick = (value) => {
+    return `${value}Hr`;
+  };
+  // --- End X-Axis Spreading Logic ---
 
   return (
-    <div className="w-full h-80 p-4 bg-white shadow rounded">
-      <h2 className="text-lg font-semibold mb-2">Performance Line Chart</h2>
+    <div className="w-full h-80 p-2 my-5 mb-20 bg-white shadow rounded">
+      <h2 className="text-lg font-semibold">Performance Chart</h2>
+
+      <p className="text-sm text-gray-600 mb-4">
+        Key Metrics for dayparting schedule performance evaluation
+      </p>
       <ResponsiveContainer width="100%" height="100%">
-        {/* Pass your 'chartData' directly to LineChart */}
-        <LineChart data={chartData}>
+        <LineChart data={processedChartData}>
           <CartesianGrid strokeDasharray="3 3" />
-          {/* Use 'hour' as the dataKey for XAxis, as per your data format */}
-          <XAxis dataKey="hour" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {selectedMetrics.map((metric, idx) => (
+          {/* X-Axis Configuration */}
+          <XAxis
+            dataKey="hourValue" // Use the new numerical hour field for positioning
+            type="number" // Crucially, set the axis type to 'number' for continuous spacing
+            domain={[0, 12]} // Define the min and max numerical range for the hours
+            ticks={xAxisNumericalTicks} // Specify exactly which numerical points should have labels
+            tickFormatter={formatXAxisHourTick} // Format the numerical labels back to your desired string format
+            allowDataOverflow={true} // Helps ensure all data points are visible even if slightly outside strict domain bounds
+          />
+          {/* Y-Axis Configuration */}
+          <YAxis
+            tickFormatter={formatYAxisCurrencyTick} // Apply the custom currency formatter
+            domain={yAxisValueDomain} // Set the fixed value domain
+            ticks={yAxisFixedTicks} // Set the specific tick marks for the Y-axis
+          />
+          <Tooltip /> {/* Shows details on hover */}
+          <Legend wrapperStyle={{ marginTop: '20px' }} />
+          {/* Displays line indicators and labels */}
+          {/* Render each selected metric as a line */}
+          {selectedMetrics.map((metric, index) => (
             <Line
               key={metric}
-              type="monotone"
-              dataKey={metric} // This will now correctly pick 'Sales', 'Revenue', 'Clicks', etc.
-              stroke={colors[idx % colors?.length]}
-              strokeWidth={2}
-              dot={false}
+              type="monotone" // Smooth curve for the line
+              dataKey={metric} // The metric (e.g., 'Sales', 'Revenue') to plot
+              stroke={chartLineColors[index % chartLineColors.length]} // Assign a color from your palette
+              strokeWidth={2} // Make the line a bit thicker
+              dot={true} // Display a dot at each data point
             />
           ))}
         </LineChart>
@@ -53,14 +90,14 @@ const PerformanceLineChart = ({ chartData, selectedMetrics }) => {
 };
 
 PerformanceLineChart.propTypes = {
-  // Update propTypes to reflect the new expected data structure
+  // PropTypes to ensure the data structure is correct
   chartData: PropTypes.arrayOf(
     PropTypes.shape({
-      hour: PropTypes.string.isRequired,
-      Sales: PropTypes.number, // Optional, depending on if all metrics are always present
+      hour: PropTypes.string.isRequired, // Expects the original hour string
+      Sales: PropTypes.number,
       Revenue: PropTypes.number,
       Clicks: PropTypes.number,
-      // Add other potential metrics here as PropTypes.number
+      // You can add more props here if your data contains other metrics
     })
   ).isRequired,
   selectedMetrics: PropTypes.arrayOf(PropTypes.string).isRequired,

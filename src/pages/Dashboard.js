@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainLayout from './../layouts/MainLayout';
-import { metricOptions, sineWaveChartData, heatMapData } from './../data/mockData';
+import { metricOptions, chartData, heatMapData } from './../data/mockData';
 
 import MultiSelectDropdown from '../components/Dropdown/MultiSelectDropdown';
 import PerformanceLineChart from '../components/Charts/PerformanceLineChart';
@@ -11,18 +11,15 @@ const Dashboard = () => {
   const [selected, setSelected] = useState(metricOptions.slice(0, 2));
   return (
     <MainLayout>
-      <div className="p-6 space-y-6">
-        <div className="p-6 flex justify-between items-center">
-          <h1 className="text-2xl font-semibold mb-4">TechSavvy Dashoard</h1>
-          <MultiSelectDropdown
-            options={metricOptions}
-            selected={selectedMetrics}
-            setSelected={setSelectedMetrics}
-          />
-        </div>
+      <div className="w-full p-2 overflow-hidden">
+        {/* <h1 className="text-2xl font-semibold">TechSavvy Dashoard</h1> */}
+        <MultiSelectDropdown
+          options={metricOptions}
+          selected={selectedMetrics}
+          setSelected={setSelectedMetrics}
+        />
 
-        <PerformanceLineChart chartData={sineWaveChartData} selectedMetrics={selectedMetrics} />
-
+        <PerformanceLineChart chartData={chartData} selectedMetrics={selectedMetrics} />
         <HeatMapTable data={heatMapData} />
       </div>
     </MainLayout>

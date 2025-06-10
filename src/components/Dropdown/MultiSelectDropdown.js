@@ -22,12 +22,12 @@ const MultiSelectDropdown = ({ options, selected, setSelected }) => {
   };
 
   return (
-    <div className="relative w-64">
+    <div className="relative w-64 ">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full border rounded px-4 py-2 text-left bg-white shadow"
+        className="w-full border rounded px-4 py-2 text-left bg-white shadow "
       >
-        {selected.length > 0 ? selected.join(', ') : 'Select metrics'}
+        {selected.length > 0 ? selected.join(', ') : 'Select Metrics'}
       </button>
 
       {open && (
