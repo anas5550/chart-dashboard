@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/chart-dashboard/static/css/main.13894541.css",
+    "main.js": "/chart-dashboard/static/js/main.750635d4.js",
+    "static/js/453.c4405677.chunk.js": "/chart-dashboard/static/js/453.c4405677.chunk.js",
+    "static/media/logo.svg": "/chart-dashboard/static/media/logo.bd5e6cff162413ea31a4ed38ea84b8d0.svg",
+    "index.html": "/chart-dashboard/index.html",
+    "main.13894541.css.map": "/chart-dashboard/static/css/main.13894541.css.map",
+    "main.750635d4.js.map": "/chart-dashboard/static/js/main.750635d4.js.map",
+    "453.c4405677.chunk.js.map": "/chart-dashboard/static/js/453.c4405677.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.13894541.css",
+    "static/js/main.750635d4.js"
+  ]
+}
