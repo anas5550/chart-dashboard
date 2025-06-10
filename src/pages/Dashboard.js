@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainLayout from './../layouts/MainLayout';
-import { metricOptions, chartData, heatMapData } from './../data/mockData';
+import { metricOptions, sineWaveChartData, heatMapData } from './../data/mockData';
 
 import MultiSelectDropdown from '../components/Dropdown/MultiSelectDropdown';
 import PerformanceLineChart from '../components/Charts/PerformanceLineChart';
@@ -16,18 +16,12 @@ const Dashboard = () => {
           <h1 className="text-2xl font-semibold mb-4">TechSavvy Dashoard</h1>
           <MultiSelectDropdown
             options={metricOptions}
-            selected={selected}
-            setSelected={setSelected}
+            selected={selectedMetrics}
+            setSelected={setSelectedMetrics}
           />
         </div>
 
-        <MultiSelectDropdown
-          options={metricOptions}
-          selected={selectedMetrics}
-          setSelected={setSelectedMetrics}
-        />
-
-        <PerformanceLineChart data={chartData} selectedMetrics={selectedMetrics} />
+        <PerformanceLineChart chartData={sineWaveChartData} selectedMetrics={selectedMetrics} />
 
         <HeatMapTable data={heatMapData} />
       </div>
