@@ -8,7 +8,7 @@ import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
 
 const AppRouter = () => (
-  <Router>
+  <Router basename="/chart-dashboard">
     <Routes>
       {/* Public Routes */}
       <Route element={<PublicRoutes />}>
