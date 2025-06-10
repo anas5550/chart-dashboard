@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+Chart Dashboard
+Welcome to the Chart Dashboard! This application offers a clean and interactive way to visualize performance data through dynamic charts and a detailed heat map. It's built with modern web technologies, providing a smooth user experience.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+✨ Features
+Mock Authentication: Secure login and logout functionality to control access to the dashboard.
+Interactive Performance Chart: Visualize key metrics over time with an interactive line chart, allowing you to select and compare different data points.
+Detailed Heat Map Table: Explore data patterns across days and hours with a color-coded heat map, highlighting performance variations at a glance.
+Responsive Design: Enjoy a consistent experience across various devices thanks to a responsive layout.
+Dynamic Sidebar: A sleek, hover-to-expand sidebar for easy navigation.
 
-## Available Scripts
+🚀 Technologies Used
+This project leverages a robust set of modern web development tools:
 
-In the project directory, you can run:
+React: For building the dynamic user interface.
+Tailwind CSS: For rapid and efficient styling with utility-first CSS.
+Recharts: A composable charting library for building beautiful and interactive data visualizations.
+React Router: For seamless navigation within the single-page application.
+ESLint: Ensures code quality and consistency through configurable linting rules.
+PropTypes: For runtime type checking of React component props, aiding in development and debugging.
+💻 Getting Started
+Follow these simple steps to get the project up and running on your local machine.
 
-### `npm start`
+Prerequisites
+Make sure you have Node.js installed (v16+ recommended).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Installation
+Clone the repository:
+npm
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+git clone https://github.com/anas5550/chart-dashboard.git
+cd chart-dashboard
+Install dependencies:
+npm
 
-### `npm test`
+npm install
+Running the Application
+To start the development server:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+npm
 
-### `npm run build`
+npm start
+This will open the application in your browser at http://localhost:3000 (or another available port).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+🔑 Authentication
+The dashboard includes a mock authentication system.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Username: admin@dev.com
+Password: 123456
+You must use these exact credentials to log in.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+🌐 Live Demo
+You can view a live demo of the application here:
+https://github.com/anas5550/chart-dashboard.git
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+🤝 Contributing
+Contributions are always welcome! If you have suggestions for improvements or find any bugs, please feel free to open an issue or submit a pull request.
