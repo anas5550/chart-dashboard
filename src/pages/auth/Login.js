@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import api from './../../utils/services/api';
+import CheckBox from '../../components/Checkbox/CheckBox';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Login = () => {
   const initialValues = {
     email: '',
     password: '',
+    rememberMe: false,
   };
 
   const validationSchema = Yup.object({
@@ -32,6 +34,7 @@ const Login = () => {
         email: values.email,
         password: values.password,
         isLoggedInHere: 0,
+        // rememberMe: values.rememberMe, //optional
       });
 
       const receivedToken =
@@ -39,10 +42,11 @@ const Login = () => {
 
       if (receivedToken) {
         localStorage.setItem('authToken', receivedToken);
+
         setAuthToken(receivedToken);
         console.log('Login successful!', response.data);
         setTimeout(() => {
-          console.log('Attempting to navigate to /'); // Added for debugging
+          console.log('Attempting to navigate to /');
           navigate('/');
         }, 1500);
       } else {
@@ -138,6 +142,9 @@ const Login = () => {
                   className="text-sm text-red-600 mt-1"
                 />
               </div>
+
+              {/* Remember Me Checkbox */}
+              <CheckBox />
 
               {loginError && (
                 <div className="text-sm text-red-700 bg-red-100 p-3 rounded-md text-center border border-red-200">
