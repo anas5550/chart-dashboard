@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { chartLineColors } from './../../utils/chartLineColors';
+import { chartLineColors } from '../../utils/constants/chartLineColors';
 import {
   LineChart,
   Line,

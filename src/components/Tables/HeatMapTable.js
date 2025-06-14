@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { days, metrics, darkToLightMetrics } from '../../constants/metricConfig';
-import { getColor } from '../../utils/getColor';
+import { getColor } from '../../utils/constants/getColor';
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const formatHour = (hour) => {
