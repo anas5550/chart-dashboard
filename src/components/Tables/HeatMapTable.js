@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { days, metrics, darkToLightMetrics } from '../../constants/metricConfig';
+import {
+  days,
+  metrics,
+  darkToLightMetrics,
+} from './../../utils/constants/metricConfig';
 import { getColor } from '../../utils/constants/getColor';
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -23,7 +27,9 @@ const HeatMapTable = ({ data }) => {
       <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 mb-4">
         {/* Dark to Light Legend */}
         <div className="flex-1 min-w-[250px] max-w-full sm:max-w-none">
-          <div className="font-medium text-sm mb-1">Color Legend (Dark → Light)</div>
+          <div className="font-medium text-sm mb-1">
+            Color Legend (Dark → Light)
+          </div>
           <div className="flex gap-1">
             {[...Array(5)].map((_, i) => (
               <div
@@ -33,12 +39,16 @@ const HeatMapTable = ({ data }) => {
               />
             ))}
           </div>
-          <div className="text-xs text-gray-500 mt-1">{darkToLightMetrics.join(', ')}</div>
+          <div className="text-xs text-gray-500 mt-1">
+            {darkToLightMetrics.join(', ')}
+          </div>
         </div>
 
         {/* Light to Dark Legend */}
         <div className="flex-1 min-w-[250px] max-w-full sm:max-w-none">
-          <div className="font-medium text-sm mb-1">Color Legend (Light → Dark)</div>
+          <div className="font-medium text-sm mb-1">
+            Color Legend (Light → Dark)
+          </div>
           <div className="flex gap-1">
             {[...Array(5)].map((_, i) => (
               <div
@@ -78,7 +88,7 @@ const HeatMapTable = ({ data }) => {
                     {day}
                     <div className="text-gray-500 text-xs">{metric}</div>
                   </th>
-                ))
+                )),
               )}
             </tr>
           </thead>
@@ -93,10 +103,13 @@ const HeatMapTable = ({ data }) => {
                 {days.map((day) =>
                   metrics.map((metric) => {
                     const cell = data.find(
-                      (d) => d.day === day && d.hour === hour && d.metric === metric
+                      (d) =>
+                        d.day === day && d.hour === hour && d.metric === metric,
                     );
                     const reverse = darkToLightMetrics.includes(metric);
-                    const bgColor = cell ? getColor(cell.value, maxVal, reverse) : '#f3f4f6';
+                    const bgColor = cell
+                      ? getColor(cell.value, maxVal, reverse)
+                      : '#f3f4f6';
 
                     return (
                       <td
@@ -112,7 +125,7 @@ const HeatMapTable = ({ data }) => {
                         )}
                       </td>
                     );
-                  })
+                  }),
                 )}
               </tr>
             ))}
@@ -130,7 +143,7 @@ HeatMapTable.propTypes = {
       hour: PropTypes.number.isRequired,
       metric: PropTypes.string.isRequired,
       value: PropTypes.number.isRequired,
-    })
+    }),
   ).isRequired,
 };
 

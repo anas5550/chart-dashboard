@@ -2,7 +2,6 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoutes from './ProtectedRoutes';
 import PublicRoutes from './PublicRoutes';
-import Home from '../pages/Home';
 import Login from '../pages/auth/Login';
 import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';

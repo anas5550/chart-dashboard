@@ -10,7 +10,10 @@ const authenticateUser = async ({ username, password }) => {
   };
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (username === FAKE_CREDS.username && password === FAKE_CREDS.password) {
+      if (
+        username === FAKE_CREDS.username &&
+        password === FAKE_CREDS.password
+      ) {
         localStorage.setItem('token', 'fake_token');
         resolve(true);
       } else {
@@ -30,7 +33,9 @@ const Login = () => {
 
   const validationSchema = Yup.object({
     username: Yup.string().email().required('Username is required'),
-    password: Yup.string().min(6, 'Minimum 6 characters').required('Password is required'),
+    password: Yup.string()
+      .min(6, 'Minimum 6 characters')
+      .required('Password is required'),
   });
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
@@ -47,8 +52,12 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">Welcome Back</h2>
-        <h2 className="text-xl font-bold mb-6 text-center text-gray-700">Login</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-700">
+          Welcome Back
+        </h2>
+        <h2 className="text-xl font-bold mb-6 text-center text-gray-700">
+          Login
+        </h2>
 
         <Formik
           initialValues={initialValues}
@@ -58,7 +67,10 @@ const Login = () => {
           {({ isSubmitting }) => (
             <Form className="space-y-5">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-600">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-600"
+                >
                   Username
                 </label>
                 <Field
@@ -74,7 +86,10 @@ const Login = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-600"
+                >
                   Password
                 </label>
                 <Field
@@ -89,8 +104,16 @@ const Login = () => {
                 />
               </div>
               <div className="flex justify-end items-center">
-                <input id="remember-me-checkbox" name="checkbox" type="checkbox" className="mr-1" />
-                <label htmlFor="remember-me-checkbox" className="text-sm font-medium capitalize">
+                <input
+                  id="remember-me-checkbox"
+                  name="checkbox"
+                  type="checkbox"
+                  className="mr-1"
+                />
+                <label
+                  htmlFor="remember-me-checkbox"
+                  className="text-sm font-medium capitalize"
+                >
                   remember me
                 </label>
               </div>
