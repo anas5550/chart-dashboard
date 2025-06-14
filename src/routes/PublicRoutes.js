@@ -1,10 +1,10 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
+import { Outlet, Navigate } from 'react-router-dom';
 
 const PublicRoutes = () => {
-  const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+  const isAuthenticated = localStorage.getItem('authToken');
+
+  return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />;
 };
 
 export default PublicRoutes;

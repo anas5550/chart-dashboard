@@ -9,7 +9,7 @@ const MainLayout = ({ children }) => {
 
   // fake logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
     navigate('/login');
   };
 
@@ -28,7 +28,10 @@ const MainLayout = ({ children }) => {
         </div>
 
         <nav className="flex-1 p-4 space-y-4 text-gray-700">
-          <Link to="/" className="flex items-center space-x-3 hover:text-blue-600 group">
+          <Link
+            to="/"
+            className="flex items-center space-x-3 hover:text-blue-600 group"
+          >
             <span className="w-6 h-6 flex items-center justify-center">
               <CiHome className="w-5 h-5" />
             </span>

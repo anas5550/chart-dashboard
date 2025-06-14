@@ -1,26 +1,28 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoutes from './ProtectedRoutes';
 import PublicRoutes from './PublicRoutes';
-import Login from '../pages/auth/Login';
-import Dashboard from '../pages/Dashboard';
-import NotFound from '../pages/NotFound';
+import routesConfig from './routesConfig';
 
 const AppRouter = () => (
   <Router>
     <Routes>
-      {/* Public Routes */}
-      <Route element={<PublicRoutes />}>
-        <Route path="/login" element={<Login />} />
-      </Route>
-
-      {/* Protected Routes */}
-      <Route element={<ProtectedRoutes />}>
-        <Route path="/" element={<Dashboard />} />
-      </Route>
-
-      {/* Fallback */}
-      <Route path="*" element={<NotFound />} />
+      {routesConfig.map((route, index) => {
+        if (route.isPublic) {
+          return (
+            <Route key={index} element={<PublicRoutes />}>
+              <Route path={route.pathname} element={<route.element />} />
+            </Route>
+          );
+        } else if (route.isProtected) {
+          return (
+            <Route key={index} element={<ProtectedRoutes />}>
+              <Route path={route.pathname} element={<route.element />} />
+            </Route>
+          );
+        }
+        return null;
+      })}
     </Routes>
   </Router>
 );
