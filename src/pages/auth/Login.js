@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import api from './../../utils/services/api';
-import CheckBox from '../../components/Checkbox/CheckBox';
+import useLogin from '../../hooks/useLogin';
 
 const Login = () => {
-  const navigate = useNavigate();
-  const [loginError, setLoginError] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
+  // custom hook for login
+  const { login, loginError, authToken, isLoading } = useLogin();
 
   const initialValues = {
     email: '',
@@ -26,64 +23,8 @@ const Login = () => {
   });
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
-    setLoginError(null);
-    setSubmitting(true);
-
-    try {
-      const response = await api.post('/auth/login', {
-        email: values.email,
-        password: values.password,
-        isLoggedInHere: 0,
-        // rememberMe: values.rememberMe, //optional
-      });
-
-      const receivedToken =
-        response.data.token || response.data.accessToken || response.data.jwt;
-
-      if (receivedToken) {
-        localStorage.setItem('authToken', receivedToken);
-
-        setAuthToken(receivedToken);
-        console.log('Login successful!', response.data);
-        setTimeout(() => {
-          console.log('Attempting to navigate to /');
-          navigate('/');
-        }, 1500);
-      } else {
-        setLoginError(
-          'Login successful, but no authentication token was received.',
-        );
-        console.warn(
-          'Login successful, but no token found in response:',
-          response.data,
-        );
-      }
-    } catch (err) {
-      if (err.response) {
-        console.error('Login error:', err.response.data);
-        setLoginError(
-          err.response.data.message || 'Invalid credentials. Please try again.',
-        );
-        if (err.response.data.errors) {
-          if (err.response.data.errors.email) {
-            setFieldError('email', err.response.data.errors.email);
-          }
-          if (err.response.data.errors.password) {
-            setFieldError('password', err.response.data.errors.password);
-          }
-        }
-      } else if (err.request) {
-        console.error('No response from server:', err.request);
-        setLoginError(
-          'Network error. Please check your connection and try again.',
-        );
-      } else {
-        console.error('Error setting up login request:', err.message);
-        setLoginError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    await login(values, setFieldError);
+    setSubmitting(false);
   };
 
   return (
@@ -101,7 +42,9 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
+          {/* Formik's isSubmitting prop should now be mapped to isLoading from your hook */}
+          {() => (
+            // Removed isSubmitting from destructuring here
             <Form className="space-y-6">
               <div>
                 <label
@@ -143,15 +86,29 @@ const Login = () => {
                 />
               </div>
 
-              {/* Remember Me Checkbox */}
-              <CheckBox />
+              <div className="flex items-center justify-end">
+                <Field
+                  id="remember-me-checkbox"
+                  name="rememberMe"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="remember-me-checkbox"
+                  className="ml-2 block text-sm text-gray-700 select-none cursor-pointer"
+                >
+                  Remember me
+                </label>
+              </div>
 
+              {/* Display login error from the hook */}
               {loginError && (
                 <div className="text-sm text-red-700 bg-red-100 p-3 rounded-md text-center border border-red-200">
                   {loginError}
                 </div>
               )}
 
+              {/* Display success message from the hook */}
               {authToken && (
                 <div className="text-sm text-green-700 bg-green-100 p-3 rounded-md text-center border border-green-200">
                   Login Successful! Redirecting...
@@ -160,11 +117,11 @@ const Login = () => {
 
               <button
                 type="submit"
-                disabled={isSubmitting || authToken}
+                disabled={isLoading || authToken} // Use isLoading from the hook
                 className="w-full bg-blue-600 text-white py-2.5 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out text-lg font-semibold shadow-md
                            disabled:opacity-60 disabled:cursor-not-allowed transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                {isSubmitting ? 'Logging in...' : 'Sign In'}
+                {isLoading ? 'Logging in...' : 'Sign In'}
               </button>
             </Form>
           )}
