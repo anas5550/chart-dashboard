@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/chart-dashboard/static/css/main.3174b2e3.css",
-    "main.js": "/chart-dashboard/static/js/main.783bed81.js",
+    "main.css": "/chart-dashboard/static/css/main.75b80ae4.css",
+    "main.js": "/chart-dashboard/static/js/main.bc05a47e.js",
     "static/js/453.c4405677.chunk.js": "/chart-dashboard/static/js/453.c4405677.chunk.js",
     "static/media/logo.svg": "/chart-dashboard/static/media/logo.bd5e6cff162413ea31a4ed38ea84b8d0.svg",
     "index.html": "/chart-dashboard/index.html",
-    "main.3174b2e3.css.map": "/chart-dashboard/static/css/main.3174b2e3.css.map",
-    "main.783bed81.js.map": "/chart-dashboard/static/js/main.783bed81.js.map",
+    "main.75b80ae4.css.map": "/chart-dashboard/static/css/main.75b80ae4.css.map",
+    "main.bc05a47e.js.map": "/chart-dashboard/static/js/main.bc05a47e.js.map",
     "453.c4405677.chunk.js.map": "/chart-dashboard/static/js/453.c4405677.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3174b2e3.css",
-    "static/js/main.783bed81.js"
+    "static/css/main.75b80ae4.css",
+    "static/js/main.bc05a47e.js"
   ]
 }
