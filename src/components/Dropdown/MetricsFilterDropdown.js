@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from './../../utils/services/api';
+import PropTypes from 'prop-types';
 
-const MetricsFilterDropdown = () => {
+const MetricsFilterDropdown = ({
+  onApplyCallback,
+  initialAppliedMetrics,
+  userIdentityConstant,
+}) => {
   const [metricsList, setMetricsList] = useState([]);
-  const [selectedMetrics, setSelectedMetrics] = useState([]);
-  const [appliedMetrics, setAppliedMetrics] = useState([]);
+  const [selectedMetrics, setSelectedMetrics] = useState(
+    initialAppliedMetrics || [],
+  ); // Initialize with prop
+  const [appliedMetrics, setAppliedMetrics] = useState(
+    initialAppliedMetrics || [],
+  ); // Initialize with prop
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,18 +39,24 @@ const MetricsFilterDropdown = () => {
           },
         );
 
-        // The API response is an object with a 'result' key containing the array
         if (
           response.data &&
           Array.isArray(response.data.result) &&
           response.data.result.length > 0
         ) {
           setMetricsList(response.data.result);
-          const initialCodes = response.data.result.map(
-            (metric) => metric.code,
-          );
-          setSelectedMetrics(initialCodes);
-          setAppliedMetrics(initialCodes);
+          // If initialAppliedMetrics were provided, use them. Otherwise, default to all fetched.
+          if (initialAppliedMetrics && initialAppliedMetrics.length > 0) {
+            setSelectedMetrics(initialAppliedMetrics);
+            setAppliedMetrics(initialAppliedMetrics);
+          } else {
+            const allFetchedCodes = response.data.result.map(
+              (metric) => metric.code,
+            );
+            setSelectedMetrics(allFetchedCodes);
+            setAppliedMetrics(allFetchedCodes);
+            onApplyCallback(allFetchedCodes); // Apply all if no initial were given
+          }
         } else if (
           response.data &&
           Array.isArray(response.data.result) &&
@@ -50,16 +65,16 @@ const MetricsFilterDropdown = () => {
           setMetricsList([]);
           setSelectedMetrics([]);
           setAppliedMetrics([]);
-          // Optionally set a message if an empty array is a 'no data' scenario
-          // setError('No metrics available based on current criteria.');
+          setError('No metrics available based on current criteria.');
+          onApplyCallback([]); // Inform parent no metrics were applied
         } else {
-          // This branch will be hit if response.data is NOT an object with a 'result' array
           setError(
             'API returned an unexpected data format. Expected an object with a "result" array.',
           );
           setMetricsList([]);
           setSelectedMetrics([]);
           setAppliedMetrics([]);
+          onApplyCallback([]); // Inform parent no metrics were applied
         }
       } catch (err) {
         if (err.response) {
@@ -80,13 +95,25 @@ const MetricsFilterDropdown = () => {
         setMetricsList([]);
         setSelectedMetrics([]);
         setAppliedMetrics([]);
+        onApplyCallback([]); // Inform parent no metrics were applied
       } finally {
         setLoading(false);
       }
     };
 
     fetchMetricsFilterList();
-  }, []);
+  }, [userIdentityConstant]); // Re-run effect if userIdentityConstant changes
+
+  // Sync internal selectedMetrics/appliedMetrics with parent's initialAppliedMetrics prop
+  useEffect(() => {
+    // Only update if the prop value is different from current internal state to avoid unnecessary re-renders
+    if (
+      JSON.stringify(initialAppliedMetrics) !== JSON.stringify(appliedMetrics)
+    ) {
+      setAppliedMetrics(initialAppliedMetrics);
+      setSelectedMetrics(initialAppliedMetrics);
+    }
+  }, [initialAppliedMetrics]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -122,7 +149,7 @@ const MetricsFilterDropdown = () => {
   const handleApply = () => {
     setAppliedMetrics(selectedMetrics);
     setIsOpen(false);
-    console.log('Applied Metrics:', selectedMetrics);
+    onApplyCallback(selectedMetrics); // <--- THIS IS THE CRUCIAL FIX
   };
 
   const handleCancel = () => {
@@ -252,6 +279,16 @@ const MetricsFilterDropdown = () => {
       </div>
     </div>
   );
+};
+
+MetricsFilterDropdown.propTypes = {
+  onApplyCallback: PropTypes.func.isRequired,
+  initialAppliedMetrics: PropTypes.arrayOf(PropTypes.string),
+  userIdentityConstant: PropTypes.string.isRequired,
+};
+
+MetricsFilterDropdown.defaultProps = {
+  initialAppliedMetrics: [],
 };
 
 export default MetricsFilterDropdown;
