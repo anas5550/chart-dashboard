@@ -9,22 +9,48 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import api from './../../utils/services/api';
 import PropTypes from 'prop-types';
+import api from './../../utils/services/api';
+// Import the user identity constant from environment variables
+const METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY =
+  process.env.REACT_APP_METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY;
 
-const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
-  const [apiResponse, setApiResponse] = useState(null);
+const PerformanceLineChart = ({ selectedMetricsForChart }) => {
   const [chartDataArray, setChartDataArray] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [apiResponseMessage, setApiResponseMessage] = useState('');
+
+  // Define an array of colors for the chart lines
+  const colors = [
+    '#8884d8',
+    '#82ca9d',
+    '#ffc658',
+    '#ff7300',
+    '#00b0ff',
+    '#f77f00',
+    '#39e6a3',
+    '#e60026',
+    '#1a75ff',
+    '#ff0073',
+    '#9933ff',
+    '#66cc99',
+    '#c06c84',
+    '#6c5b7b',
+    '#355c7d',
+    '#f67280',
+    '#f8b195',
+    '#355c7d',
+  ];
 
   useEffect(() => {
     const fetchPerformanceMetrics = async () => {
       setLoading(true);
       setError(null);
-      setApiResponse(null);
+      setApiResponseMessage('');
       setChartDataArray([]);
 
+      // Validate selected metrics before making the API call
       if (!selectedMetricsForChart || selectedMetricsForChart.length === 0) {
         setLoading(false);
         setError(
@@ -44,73 +70,91 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
           {
             headers: {
               'X-USER-IDENTITY':
-                process.env
-                  .REACT_APP_METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY,
+                'U2FsdGVkX18Dn8jRBUPld+yYRIPCj8GsUJ7v9HnvGD5mQQZ9dTfet+7GQAwnGUxe26V4RxrNX4U6/W1ZgmEUVt4oNmEX73hClpTwEYVj3y1iyLPXDFa+HNVJV/l6sHFhpw9oTMdoMihzz3W+7Sf5SL7wi3OwSN7CY6aVdLzbisMAnNKxa1UAfXkHG3e2L8zXWMBpIO1j9HAGQ565NGjx3pyIg693ZliYeX5fvfFDDf/IUJOZkBq/5/io+e5OQp0R/XO9vs/B9PFpMqnTfWpeHQOgGTivxWrd8FNVW+3fVYz+9ijX3gJBKV4YwXzapDO5Jy6kKnzGFPzzMUeSyTTO6fBlbBlsb0adSS8AD5FnsC8MZLVtRkkKJeRweG0ioBb8p97tOxFU4/HC/I+uS545m/IIoln2Ok5x9b/B9xbWd4zP/43qEhNCgJj69GqDhr8PTlj7DkNbIOpb0XJ/uvUAW/fPw39WPAP7zueYh8kYOkUiFWwe+O8jyJxq+KijsVg/CchizVKNv5yUyEJA0+6YV2sSebNkS4ewBnJIkzhiLkKmBu17e1uz5N5eG8ZlANqFVYvKixhvgbLgMLQ9bE92xWHFyPWrcaiYTj7xNTeEvIQdolG/nRICCW4ptXUhAZyF8NTk59U+PKGOEBiZZaRqLqoe3w6VEwlbeEBty/dpHgzleh60DfJy59agPQ21k1gAdMhn4dRFxk9shs/6RJ7VjKUNT/LuJctWL0RH7qXiMPF0HnNmGB22tyEU94Y+8fGZrDx62GDRrv3AKmSxLevWaIXiIpZbysI2rJe/MuT5ZSdmCkpTdJ6Wv5U4OeQqFPiVb5O6DqboXGkv9wSfXQ3CgzW8OZfoXUZitLHUif+XADyvcV7G+9LWnU+Yd7N86m7X0jUxiTGuU5MmHxvJhtq8mGiyUc5QB6vXaD+GsXm110h8ZSyNC1dqaHDrBJfxiy+IMy7gHnKtPMsT0Q+vlq9zhecBQlx9MgmdeD5po/LiJxfFyz+ArzAkBlhONNJVZsa27hgWnDhWUqN50s+Aq+jXYWxUmvI0Vfn0yHXrUVXKA3HIS/g1DbP7vmrj2tN3OgIC5cyiw7uU3armH2ivFWf+CrxWkKvxJ6tOgLwkiMmikNmLGv4eVQEr+7Walon8JFaHwZ4iIxlJFdZYzhpcgeszPwxrR/KyiDnydqQnMePcVwOdFHlFFmIJRBvD6MuKwNhHQFByEkcAvYjZfkjXNWemUvjqj9vPUn+M0vGaIax4wDD/VS1B/CiXOxH9EZEkhjIPTBYlvyuR9CxH/I39/hZHC5LCw5llbLKsXednmqrwGAyCIXsiF3P2/OKT2brUMc1qCKFMXpS0o+a3aoj6/KHdJJQVlYrfKA3nKYwMYlVG3CadBySYxOAymBWpIEjeXHeyL0Jrd10hYAtWspVrMVKz/J+qFHRpQ07fD+zRMyu+wGE8AO+ELkBewuwVbuIXKaObnGyJqTpnpKXTYKTqNjoIZLs8xFRo40yhZ5yi/Ll2yDlaBu9MHizHwsJraLbJXzAiEXw81uhNHcpMGdDUknAvImcrCqhyt3ARvc2Yg0H/h0XkTyGngieel3zg/q/6sY0NZRLrntrYioGorqHtbnDC3wd3IeAE/Hn6trHxFX7gSklgapAIh9AE+q6VlScWL4BVrBa8bEOq1DYL9L7c04hGmUoi8fixSdpJh3D2H7MKOI+TXdD0Z6GL8Oe6+DFrKTWQLViF5coUzDPrJkN5OT/Z/KUcAhJeRwHtQpRmq+kmcILPbWELrU7j+gvdPvZ3vZ/Z0b2l3EOoiMZfQMEj704UUzSqwmMlVzuZMdPQ4RQ6gYS8rU90hS6QxrdDvSeDheaPftriKOs6o4TEBIwWWCH85MjU4zky5uirMg+WEXuxUqLnioAMlGodfv2rIVRAJbc4iaifU2oDh6scgnNj5eHT63mOn5yF1ST5TcKw/RmZ1PLo6RAPNuDY4W977rHbtiWQ5XywaFcRyXXwjHpUO+3oTMlyZC79P3jbeqc11MkAn0Ws5XBGQ63zyora4sWc38iMlRLsk028KMFd5eCZxTW9mQ==',
             },
           },
         );
 
-        setApiResponse(response.data);
+        // Log the full API response data to the console for debugging
+        console.log(
+          'PerformanceLineChart - Full API Response Data:',
+          response.data,
+        );
 
-        // Expecting response.data.result to be an object with 'categories' and 'series'
+        // Store the API message if available (e.g., "No data found!")
+        if (response.data && response.data.message) {
+          setApiResponseMessage(response.data.message);
+        }
+
+        // Expected response.data.result is an object with 'categories' and 'series'
         if (
           response.data &&
           response.data.result &&
           Array.isArray(response.data.result.categories) &&
-          Array.isArray(response.data.result.series) &&
-          response.data.result.categories.length > 0
+          Array.isArray(response.data.result.series)
         ) {
           const { categories, series } = response.data.result;
 
-          // Transform data for Recharts
-          const transformedData = categories.map((category, index) => {
-            const dataPoint = { date: category }; // 'date' will be our X-axis key
-            series.forEach((s) => {
-              if (
-                selectedMetricsForChart.includes(s.name) &&
-                s.data &&
-                s.data.length > index
-              ) {
-                dataPoint[s.name] = s.data[index]; // Assign metric value to its name key
-              }
+          if (categories.length > 0 && series.length > 0) {
+            // Transform data for Recharts:
+            // Each element in transformedData array will look like:
+            // { date: "00:00:00", CPC: 4.68, CR_perc: 5.44, ROAS: 8.67 }
+            const transformedData = categories.map((category, index) => {
+              const dataPoint = { date: category }; // 'date' is the common key for X-axis
+              series.forEach((s) => {
+                // Only include data for metrics that were actually selected
+                // And ensure the data array exists and has a value at the current index
+                if (
+                  selectedMetricsForChart.includes(s.name) &&
+                  s.data &&
+                  s.data.length > index
+                ) {
+                  dataPoint[s.name] = s.data[index];
+                }
+              });
+              return dataPoint;
             });
-            return dataPoint;
-          });
-
-          setChartDataArray(transformedData);
-        } else if (
-          response.data &&
-          response.data.result &&
-          Array.isArray(response.data.result.categories) &&
-          response.data.result.categories.length === 0
-        ) {
-          setChartDataArray([]);
-          setError(
-            response.data.message ||
-              'API returned no data for the selected period and metrics.',
-          );
+            setChartDataArray(transformedData);
+          } else {
+            // Case: result object exists, but categories or series are empty
+            setChartDataArray([]);
+            setError(
+              'API returned no chart data points for the selected period/metrics.',
+            );
+          }
         } else {
+          // Case: API response structure is not as expected (missing result, categories, or series)
           setChartDataArray([]);
           setError(
             response.data.message ||
-              'API returned an unexpected data format or missing chart data (categories/series).',
+              'API returned an unexpected data structure. Expected "result" with "categories" and "series".',
           );
         }
       } catch (err) {
+        // Handle network errors or API errors (non-2xx status codes)
         if (err.response) {
           setError(
             err.response.data.message ||
               'Failed to fetch data from the server.',
           );
-          console.error('API Error:', err.response.data);
+          console.error(
+            'PerformanceLineChart - API Error Response:',
+            err.response.data,
+          );
         } else if (err.request) {
           setError('Network error: No response received from the server.');
-          console.error('Network Error:', err.request);
+          console.error(
+            'PerformanceLineChart - Network Request Error:',
+            err.request,
+          );
         } else {
           setError(
             'An unexpected error occurred while setting up the request.',
           );
-          console.error('Request Setup Error:', err.message);
+          console.error(
+            'PerformanceLineChart - Request Setup Error:',
+            err.message,
+          );
         }
         setChartDataArray([]);
       } finally {
@@ -119,33 +163,18 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
     };
 
     fetchPerformanceMetrics();
-  }, [selectedMetricsForChart]); // Dependency array includes selectedMetricsForChart
-
-  const colors = [
-    '#8884d8',
-    '#82ca9d',
-    '#ffc658',
-    '#ff7300',
-    '#00b0ff',
-    '#f77f00',
-    '#39e6a3',
-    '#e60026',
-    '#1a75ff',
-    '#ff0073',
-    '#9933ff',
-    '#66cc99',
-  ];
+  }, [selectedMetricsForChart]);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-lg max-w-full mx-auto my-6">
+    <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 my-6 w-full overflow-hidden">
       <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">
-        Metrics Performance Overview
+        Metrics Performance Chart
       </h2>
 
       {loading && (
-        <div className="flex items-center justify-center h-80">
+        <div className="flex items-center justify-center h-80 flex-col">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <p className="ml-4 text-lg text-gray-600">
+          <p className="ml-4 text-lg text-gray-600 mt-4">
             Loading performance data...
           </p>
         </div>
@@ -158,24 +187,27 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
         >
           <strong className="font-bold">Error!</strong>
           <span className="block sm:inline ml-2">{error}</span>
-          <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
-            <button>
-              <svg
-                className="fill-current h-6 w-6 text-red-500"
-                role="button"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <title>Close</title>
-                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.303l-2.651 2.651a1.2 1.2 0 1 1-1.697-1.697L8.303 10l-2.651-2.651a1.2 1.2 0 1 1 1.697-1.697L10 8.697l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 2.651a1.2 1.2 0 0 1 0 1.697z" />
-              </svg>
-            </button>
-          </span>
+          <button
+            type="button"
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+            onClick={() => setError(null)}
+          >
+            <svg
+              className="fill-current h-6 w-6 text-red-500"
+              role="button"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <title>Close</title>
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.303l-2.651 2.651a1.2 1.2 0 1 1-1.697-1.697L8.303 10l-2.651-2.651a1.2 1.2 0 1 1 1.697-1.697L10 8.697l2.651-2.651a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 2.651a1.2 1.2 0 0 1 0 1.697z" />
+            </svg>
+          </button>
         </div>
       )}
 
+      {/* Render the chart only if not loading, no error, and chartDataArray has data */}
       {!loading && !error && chartDataArray.length > 0 ? (
-        <div className="w-full h-80">
+        <div className="w-full h-80 sm:h-96 lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartDataArray}
@@ -189,19 +221,19 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: '#6b7280' }}
+                tick={{ fill: '#6b7280', fontSize: 12 }}
                 angle={-30}
                 textAnchor="end"
                 height={50}
               />
-              <YAxis tick={{ fill: '#6b7280' }} />
+              <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#f9fafb',
                   border: '1px solid #e5e7eb',
                   borderRadius: '4px',
                 }}
-                labelStyle={{ color: '#374151' }}
+                labelStyle={{ color: '#374151', fontWeight: 'bold' }}
                 itemStyle={{ color: '#4b5563' }}
               />
               <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
@@ -210,7 +242,7 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
                 <Line
                   key={metric}
                   type="monotone"
-                  dataKey={metric} // Data key corresponds to the metric name
+                  dataKey={metric}
                   stroke={colors[index % colors.length]}
                   activeDot={{ r: 8 }}
                   strokeWidth={2}
@@ -220,13 +252,12 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
           </ResponsiveContainer>
         </div>
       ) : (
+        // Display no data message if data is empty or there's an error
         !loading &&
         !error && (
           <p className="text-gray-600 col-span-full text-center py-8">
-            No performance data available for the selected period.
-            {apiResponse &&
-              apiResponse.message &&
-              ` Server message: "${apiResponse.message}"`}
+            {apiResponseMessage ||
+              'No performance data available for the selected period.'}
           </p>
         )
       )}
@@ -234,8 +265,8 @@ const MetricsPerformanceChart = ({ selectedMetricsForChart }) => {
   );
 };
 
-MetricsPerformanceChart.propTypes = {
+PerformanceLineChart.propTypes = {
   selectedMetricsForChart: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default MetricsPerformanceChart;
+export default PerformanceLineChart;
