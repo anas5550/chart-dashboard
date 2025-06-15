@@ -5,7 +5,7 @@ import api from '../utils/services/api';
 const useLogin = () => {
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
+  const [authToken, setAuthToken] = useState(null); // This is just for local UI feedback
   const [isLoading, setIsLoading] = useState(false);
 
   const login = async (values, setFieldError) => {
@@ -22,9 +22,28 @@ const useLogin = () => {
       const receivedToken =
         response.data.token || response.data.accessToken || response.data.jwt;
 
+      const receivedUserIdentity =
+        response.data.userIdentity ||
+        response.data.xIdentity ||
+        response.data.your_user_identity_field; // <=== ADJUST THIS LINE
+
       if (receivedToken) {
         localStorage.setItem('authToken', receivedToken);
-        setAuthToken(receivedToken);
+
+        const receivedUserIdentity =
+          response.data.userIdentity ||
+          response.data.xIdentity ||
+          response.data.your_identity_field_name;
+
+        if (receivedUserIdentity) {
+          localStorage.setItem('userIdentity', receivedUserIdentity); // Save the X-USER-IDENTITY value
+        } else {
+          console.warn(
+            "Login successful, but 'X-USER-IDENTITY' value was not found in the response.",
+          );
+        }
+
+        setAuthToken(receivedToken); // Update local state for UI feedback
         console.log('Login successful!', response.data);
         setTimeout(() => {
           console.log('Attempting to navigate to /');

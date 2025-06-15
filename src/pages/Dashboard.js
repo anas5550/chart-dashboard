@@ -2,37 +2,29 @@ import React, { useState } from 'react';
 import MainLayout from '../components/lauouts/MainLayout';
 import { metricOptions, chartData, heatMapData } from './../data/mockData';
 
-import MultiSelectDropdown from '../components/Dropdown/MultiSelectDropdown';
-import PerformanceLineChart from '../components/Charts/PerformanceLineChart';
 import HeatMapTable from '../components/Tables/HeatMapTable';
+import MetricsFilterDropdown from '../components/Dropdown/MetricsFilterDropdown';
+import PerformanceLineChart from '../components/Charts/PerformanceLineChart';
 
 const Dashboard = () => {
-  const [selectedMetrics, setSelectedMetrics] = useState([
-    'Sales',
+  const [appliedMetrics, setAppliedMetrics] = useState([
+    'Spend',
     'Revenue',
-    'Clicks',
+    'Orders',
   ]);
+
+  const handleMetricsApply = (metrics) => {
+    setAppliedMetrics(metrics);
+  };
 
   return (
     <MainLayout>
       <div className="w-[80vw] overflow-x-hidden">
-        <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
-          <h1 className="text-2xl font-semibold mb-0 sm:mb-0">
-            TechSavvy Dashboard
-          </h1>
-          <MultiSelectDropdown
-            options={metricOptions}
-            selected={selectedMetrics}
-            setSelected={setSelectedMetrics}
-          />
-        </div>
-
-        <div className="p-4">
-          <PerformanceLineChart
-            chartData={chartData}
-            selectedMetrics={selectedMetrics}
-          />
-        </div>
+        <MetricsFilterDropdown
+          onApplyCallback={handleMetricsApply}
+          initialAppliedMetrics={appliedMetrics}
+        />
+        <PerformanceLineChart selectedMetricsForChart={appliedMetrics} />
 
         <div className="p-4 overflow-x-auto">
           <HeatMapTable data={heatMapData} />

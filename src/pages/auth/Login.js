@@ -8,8 +8,8 @@ const Login = () => {
   const { login, loginError, authToken, isLoading } = useLogin();
 
   const initialValues = {
-    email: '',
-    password: '',
+    email: 'test@dev.com',
+    password: '#Test@123',
     rememberMe: false,
   };
 
