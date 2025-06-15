@@ -11,17 +11,15 @@ import {
 } from 'recharts';
 import PropTypes from 'prop-types';
 import api from './../../utils/services/api';
-// Import the user identity constant from environment variables
-const METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY =
-  process.env.REACT_APP_METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY;
+import { colors } from '../../utils/constants/getColor';
 
 const PerformanceLineChart = ({ selectedMetricsForChart }) => {
+  const [apiResponse, setApiResponse] = useState(null); // Correctly declared apiResponse state
   const [chartDataArray, setChartDataArray] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [apiResponseMessage, setApiResponseMessage] = useState('');
 
-  // Define an array of colors for the chart lines
   const colors = [
     '#8884d8',
     '#82ca9d',
@@ -49,8 +47,8 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
       setError(null);
       setApiResponseMessage('');
       setChartDataArray([]);
+      setApiResponse(null); // Reset API response data
 
-      // Validate selected metrics before making the API call
       if (!selectedMetricsForChart || selectedMetricsForChart.length === 0) {
         setLoading(false);
         setError(
@@ -75,18 +73,12 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           },
         );
 
-        // Log the full API response data to the console for debugging
-        console.log(
-          'PerformanceLineChart - Full API Response Data:',
-          response.data,
-        );
+        setApiResponse(response.data); // Store the full response data
 
-        // Store the API message if available (e.g., "No data found!")
         if (response.data && response.data.message) {
           setApiResponseMessage(response.data.message);
         }
 
-        // Expected response.data.result is an object with 'categories' and 'series'
         if (
           response.data &&
           response.data.result &&
@@ -96,14 +88,9 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           const { categories, series } = response.data.result;
 
           if (categories.length > 0 && series.length > 0) {
-            // Transform data for Recharts:
-            // Each element in transformedData array will look like:
-            // { date: "00:00:00", CPC: 4.68, CR_perc: 5.44, ROAS: 8.67 }
             const transformedData = categories.map((category, index) => {
-              const dataPoint = { date: category }; // 'date' is the common key for X-axis
+              const dataPoint = { date: category };
               series.forEach((s) => {
-                // Only include data for metrics that were actually selected
-                // And ensure the data array exists and has a value at the current index
                 if (
                   selectedMetricsForChart.includes(s.name) &&
                   s.data &&
@@ -116,14 +103,12 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
             });
             setChartDataArray(transformedData);
           } else {
-            // Case: result object exists, but categories or series are empty
             setChartDataArray([]);
             setError(
               'API returned no chart data points for the selected period/metrics.',
             );
           }
         } else {
-          // Case: API response structure is not as expected (missing result, categories, or series)
           setChartDataArray([]);
           setError(
             response.data.message ||
@@ -131,7 +116,6 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           );
         }
       } catch (err) {
-        // Handle network errors or API errors (non-2xx status codes)
         if (err.response) {
           setError(
             err.response.data.message ||
@@ -205,7 +189,6 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
         </div>
       )}
 
-      {/* Render the chart only if not loading, no error, and chartDataArray has data */}
       {!loading && !error && chartDataArray.length > 0 ? (
         <div className="w-full h-80 sm:h-96 lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -252,7 +235,6 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           </ResponsiveContainer>
         </div>
       ) : (
-        // Display no data message if data is empty or there's an error
         !loading &&
         !error && (
           <p className="text-gray-600 col-span-full text-center py-8">
