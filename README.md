@@ -44,8 +44,9 @@ This will open the application in your browser at http://localhost:3000 (or anot
 🔑 Authentication
 The dashboard includes a mock authentication system.
 
-Username: admin@dev.com
-Password: 123456
+username/email: test@dev.com,
+password: #Test@123,
+
 You must use these exact credentials to log in.
 
 🌐 Live Demo

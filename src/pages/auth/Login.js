@@ -7,9 +7,15 @@ const Login = () => {
   // custom hook for login
   const { login, loginError, authToken, isLoading } = useLogin();
 
+  // const initialValues = {
+  //   email: 'test@dev.com',
+  //   password: '#Test@123',
+  //   rememberMe: false,
+  // };
+
   const initialValues = {
-    email: 'test@dev.com',
-    password: '#Test@123',
+    email: '',
+    password: '',
     rememberMe: false,
   };
 
