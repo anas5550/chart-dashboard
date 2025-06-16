@@ -1,10 +1,9 @@
 import React, { useMemo, useCallback, memo } from 'react'; // Import useMemo, useCallback, memo
 import PropTypes from 'prop-types';
 import useHeatmapData from '../../hooks/useHeatmapData'; // Import the new hook
-import { daysOfWeek } from '../../utils/constants/daysOfWeek';
 import { heatmapMetrics } from '../../utils/constants/heatmapMetrics';
+import { daysOfWeek } from './../../utils/constants/daysOfWeekConstant';
 
-// User identity for the heatmap API call, retrieved from environment variables
 const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;
 
 const HeatMapTable = memo(() => {
