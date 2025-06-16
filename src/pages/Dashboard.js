@@ -23,7 +23,6 @@ const Dashboard = () => {
         <MetricsFilterDropdown
           onApplyCallback={handleMetricsApply}
           initialAppliedMetrics={appliedMetrics}
-          userIdentityConstant={process.env.REACT_APP_USER_IDENTITY}
         />
 
         <PerformanceLineChart selectedMetricsForChart={appliedMetrics} />

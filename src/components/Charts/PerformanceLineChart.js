@@ -13,8 +13,6 @@ import PropTypes from 'prop-types';
 import api from './../../utils/services/api';
 import { colors } from '../../utils/constants/getColor';
 
-const METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY =
-  process.env.REACT_APP_USER_IDENTITY;
 ///
 
 const PerformanceLineChart = ({ selectedMetricsForChart }) => {
@@ -56,7 +54,7 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           },
           {
             headers: {
-              'X-USER-IDENTITY': METRICS_PERFORMANCE_LINE_CHART_USER_IDENTITY,
+              'X-USER-IDENTITY': process.env.REACT_APP_USER_IDENTITY,
             },
           },
         );
