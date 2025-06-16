@@ -20,11 +20,6 @@ const Dashboard = () => {
   return (
     <MainLayout>
       <div className="space-y-8 p-4 sm:p-6 lg:p-8">
-        <MetricsFilterDropdown
-          onApplyCallback={handleMetricsApply}
-          initialAppliedMetrics={appliedMetrics}
-        />
-
         <PerformanceLineChart selectedMetricsForChart={appliedMetrics} />
 
         {/* HeatMapTable */}

@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import useMetricsFilter from '../../hooks/useMetricsFilter';
 
 const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
-  const { metricsList, loading, error } = useMetricsFilter(); // hook to fetch the metrics filter options
+  const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
+  const { metricsList, loading, error } =
+    useMetricsFilter(userIdentityConstant); // hook to fetch the metrics filter options
 
   const [selectedMetrics, setSelectedMetrics] = useState(
     initialAppliedMetrics || [],

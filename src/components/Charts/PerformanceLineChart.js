@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -10,138 +10,68 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import PropTypes from 'prop-types';
-import api from './../../utils/services/api';
 import { colors } from '../../utils/constants/getColor';
 
-///
+// Import the custom hooks
+import useMetricsFilter from '../../hooks/useMetricsFilter'; // Hook to fetch available metric options for dropdown
+import usePerformanceMetrics from '../../hooks/usePerformanceMetrics'; // Hook to fetch chart data based on selected metrics
+import MetricsFilterDropdown from '../Dropdown/MetricsFilterDropdown';
 
-const PerformanceLineChart = ({ selectedMetricsForChart }) => {
-  const [apiResponse, setApiResponse] = useState(null);
-  const [chartDataArray, setChartDataArray] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [apiResponseMessage, setApiResponseMessage] = useState('');
+const PerformanceLineChart = () => {
+  const userIdentity = process.env.REACT_APP_USER_IDENTITY;
+  const [selectedMetrics, setSelectedMetrics] = useState([]);
+
+  // for populating the dropdown options.
+  const {
+    metricsList: availableMetrics,
+    loading: loadingAvailableMetrics,
+    error: errorAvailableMetrics,
+  } = useMetricsFilter(userIdentity);
+
+  // Use the usePerformanceMetrics hook to fetch the actual chart data.
+  // This hook depends `userIdentity`.
+  const {
+    chartDataArray,
+    loading: loadingChartData,
+    error: chartError,
+    apiResponseMessage,
+  } = usePerformanceMetrics(selectedMetrics, userIdentity);
+
+  // Ref for handling clicks outside the dropdown to close it.
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Log the selected metrics whenever the effect runs
-    console.log(
-      'PerformanceLineChart - selectedMetricsForChart updated:',
-      selectedMetricsForChart,
-    );
+    // Only set default if availableMetrics are loaded and no metrics are currently selected
+    if (availableMetrics.length > 0 && selectedMetrics.length === 0) {
+      // Default to selecting the first three available metrics, or we can adjust as needed.
+      const defaultSelected = availableMetrics.slice(0, 3).map((m) => m.code);
+      setSelectedMetrics(defaultSelected);
+    }
+  }, [availableMetrics]); // Dependency: re-run when availableMetrics list changes
 
-    const fetchPerformanceMetrics = async () => {
-      setLoading(true);
-      setError(null);
-      setApiResponseMessage('');
-      setChartDataArray([]);
-      setApiResponse(null);
+  // Callback function passed to MetricsFilterDropdown to update `selectedMetrics`.
 
-      if (!selectedMetricsForChart || selectedMetricsForChart.length === 0) {
-        setLoading(false);
-        setError(
-          'No metrics selected for the chart. Please select metrics from the dropdown.',
-        );
-        return;
-      }
-
-      try {
-        const response = await api.post(
-          '/day-parting/DayPartingPerformanceGraphList',
-          {
-            startDate: '2024-06-08',
-            endDate: '2024-07-07',
-            metrics: selectedMetricsForChart, // This sends the selected metrics to the API
-          },
-          {
-            headers: {
-              'X-USER-IDENTITY': process.env.REACT_APP_USER_IDENTITY,
-            },
-          },
-        );
-
-        setApiResponse(response.data);
-
-        if (response.data && response.data.message) {
-          setApiResponseMessage(response.data.message);
-        }
-
-        if (
-          response.data &&
-          response.data.result &&
-          Array.isArray(response.data.result.categories) &&
-          Array.isArray(response.data.result.series)
-        ) {
-          const { categories, series } = response.data.result;
-
-          if (categories.length > 0 && series.length > 0) {
-            const transformedData = categories.map((category, index) => {
-              const dataPoint = { date: category };
-              series.forEach((s) => {
-                if (
-                  selectedMetricsForChart.includes(s.name) &&
-                  s.data &&
-                  s.data.length > index
-                ) {
-                  dataPoint[s.name] = s.data[index];
-                }
-              });
-              return dataPoint;
-            });
-            setChartDataArray(transformedData);
-          } else {
-            setChartDataArray([]);
-            setError(
-              'API returned no chart data points for the selected period/metrics.',
-            );
-          }
-        } else {
-          setChartDataArray([]);
-          setError(
-            response.data.message ||
-              'API returned an unexpected data structure. Expected "result" with "categories" and "series".',
-          );
-        }
-      } catch (err) {
-        if (err.response) {
-          setError(
-            err.response.data.message ||
-              'Failed to fetch data from the server.',
-          );
-          console.error(
-            'PerformanceLineChart - API Error Response:',
-            err.response.data,
-          );
-        } else if (err.request) {
-          setError('Network error: No response received from the server.');
-          console.error(
-            'PerformanceLineChart - Network Request Error:',
-            err.request,
-          );
-        } else {
-          setError(
-            'An unexpected error occurred while setting up the request.',
-          );
-          console.error(
-            'PerformanceLineChart - Request Setup Error:',
-            err.message,
-          );
-        }
-        setChartDataArray([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPerformanceMetrics();
-  }, [selectedMetricsForChart]);
+  const handleMetricsApplied = (metrics) => {
+    setSelectedMetrics(metrics);
+  };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 my-6 w-full overflow-hidden">
-      <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-6 border-b-2 border-blue-500 pb-2">
-        Metrics Performance Chart
-      </h2>
+    <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 my-6 w-full overflow-hidden relative">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800 border-b-2 border-blue-500 pb-2 flex-grow">
+          Metrics Performance Chart
+        </h2>
+        {/* Integrate the MetricsFilterDropdown component here */}
+        {/* Pass the necessary props for it to manage its state and communicate selection */}
+        <MetricsFilterDropdown
+          onApplyCallback={handleMetricsApplied}
+          initialAppliedMetrics={selectedMetrics}
+          userIdentityConstant={userIdentity}
+        />
+      </div>
 
-      {loading && (
+      {/* Conditional rendering for loading, error, or chart data */}
+      {loadingChartData && (
         <div className="flex items-center justify-center h-80 flex-col">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           <p className="ml-4 text-lg text-gray-600 mt-4">
@@ -150,17 +80,18 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
         </div>
       )}
 
-      {error && (
+      {chartError && (
         <div
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
           role="alert"
         >
           <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline ml-2">{error}</span>
+          <span className="block sm:inline ml-2">{chartError}</span>
+          {/* Button to clear the error message */}
           <button
             type="button"
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
-            onClick={() => setError(null)}
+            onClick={() => setSelectedMetrics([])}
           >
             <svg
               className="fill-current h-6 w-6 text-red-500"
@@ -175,7 +106,7 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
         </div>
       )}
 
-      {!loading && !error && chartDataArray.length > 0 ? (
+      {!loadingChartData && !chartError && chartDataArray.length > 0 ? (
         <div className="w-full h-80 sm:h-96 lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
@@ -207,7 +138,7 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
               />
               <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
 
-              {selectedMetricsForChart.map((metric, index) => (
+              {selectedMetrics.map((metric, index) => (
                 <Line
                   key={metric}
                   type="monotone"
@@ -221,8 +152,9 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
           </ResponsiveContainer>
         </div>
       ) : (
-        !loading &&
-        !error && (
+        // Display message if no data is available after loading and without errors
+        !loadingChartData &&
+        !chartError && (
           <p className="text-gray-600 col-span-full text-center py-8">
             {apiResponseMessage ||
               'No performance data available for the selected period.'}
@@ -233,8 +165,6 @@ const PerformanceLineChart = ({ selectedMetricsForChart }) => {
   );
 };
 
-PerformanceLineChart.propTypes = {
-  selectedMetricsForChart: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
+PerformanceLineChart.propTypes = {};
 
 export default PerformanceLineChart;

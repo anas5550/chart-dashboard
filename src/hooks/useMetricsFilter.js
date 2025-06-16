@@ -15,7 +15,7 @@ const useMetricsFilter = (userIdentityConstant) => {
           '/day-parting/DayPartingFilterList',
           { type: 'customizeMetrics' },
           {
-            headers: { 'X-USER-IDENTITY': process.env.REACT_APP_USER_IDENTITY },
+            headers: { 'X-USER-IDENTITY': userIdentityConstant },
           },
         );
 

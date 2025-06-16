@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from './../../utils/services/api';
 import PropTypes from 'prop-types';
+import { daysOfWeek } from '../../utils/constants/daysOfWeek';
+import { heatmapMetrics } from './../../utils/constants/heatmapMetrics';
 
 const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;
 const HeatMapTable = () => {
@@ -9,21 +11,7 @@ const HeatMapTable = () => {
   const [error, setError] = useState(null);
   const [apiResponse, setApiResponse] = useState(null);
   const [metricRanges, setMetricRanges] = useState({});
-  const heatmapMetrics = [
-    { label: 'CPC', value: 'CPC' },
-    { label: 'CR %', value: 'CR_perc' },
-    { label: 'ROAS', value: 'ROAS' },
-  ];
 
-  const daysOfWeek = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
   const hoursOfDay = Array.from(
     { length: 24 },
     (_, i) => `${String(i).padStart(2, '0')}:00`,
