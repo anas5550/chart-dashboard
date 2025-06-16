@@ -19,7 +19,11 @@ import MetricsFilterDropdown from '../Dropdown/MetricsFilterDropdown'; // custom
 const PerformanceLineChart = memo(() => {
   const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
 
-  const [selectedMetrics, setSelectedMetrics] = useState([]);
+  const [selectedMetrics, setSelectedMetrics] = useState([
+    'Spend',
+    'Revenue',
+    'Orders',
+  ]);
 
   const {
     metricsList: availableMetrics,

@@ -5,16 +5,10 @@ import MainLayout from './../components/lauouts/MainLayout';
 import HeatMapTable from '../components/Tables/HeatMapTable';
 
 const Dashboard = () => {
-  const [appliedMetrics, setAppliedMetrics] = useState([
-    'Spend',
-    'Revenue',
-    'Orders',
-  ]);
-
   return (
     <MainLayout>
       <div className="space-y-8 p-4 sm:p-6 lg:p-8">
-        <PerformanceLineChart selectedMetricsForChart={appliedMetrics} />
+        <PerformanceLineChart />
         <HeatMapTable />
       </div>
     </MainLayout>

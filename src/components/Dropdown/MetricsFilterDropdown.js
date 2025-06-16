@@ -155,7 +155,7 @@ const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
               No metrics available.
             </p>
           )}
-          <div className="flex justify-end p-2 border-t border-gray-200 space-x-2">
+          <div className="flex justify-center p-2 border-t border-gray-200 space-x-2">
             <button
               onClick={handleCancel}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors duration-200"
