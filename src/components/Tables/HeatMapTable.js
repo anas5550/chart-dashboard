@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, memo } from 'react'; // Import useMemo, useCallback, memo
 import PropTypes from 'prop-types';
 import useHeatmapData from '../../hooks/useHeatmapData'; // Import the new hook
-import { heatmapMetrics } from '../../utils/constants/heatmapMetrics';
+import { heatmapMetrics } from '../../utils/constants/heatmapMetricsConstant';
 import { daysOfWeek } from './../../utils/constants/daysOfWeekConstant';
 
 const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;

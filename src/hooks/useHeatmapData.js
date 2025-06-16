@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/services/api';
-import { heatmapMetrics } from '../utils/constants/heatmapMetrics';
+import { heatmapMetrics } from '../utils/constants/heatmapMetricsConstant';
 
 const useHeatmapData = (userIdentityConstant) => {
   const [heatmapData, setHeatmapData] = useState([]);
