@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import PropTypes from 'prop-types';
-import { colors } from '../../utils/constants/getColor';
+import { colors } from '../../utils/constants/colorConstants';
 
 // Import the custom hooks
 import useMetricsFilter from '../../hooks/useMetricsFilter'; // Hook to fetch available metric options for dropdown
