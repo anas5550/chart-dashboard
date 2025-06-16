@@ -11,12 +11,6 @@ const Dashboard = () => {
     'Orders',
   ]);
 
-  const handleMetricsApply = useCallback((metrics) => {
-    setAppliedMetrics(metrics);
-  }, []);
-
-  useEffect(() => {}, [appliedMetrics]);
-
   return (
     <MainLayout>
       <div className="space-y-8 p-4 sm:p-6 lg:p-8">
