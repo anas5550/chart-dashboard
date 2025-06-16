@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, memo, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -12,48 +12,38 @@ import {
 import PropTypes from 'prop-types';
 import { colors } from '../../utils/constants/colorConstants';
 
-// Import the custom hooks
-import useMetricsFilter from '../../hooks/useMetricsFilter'; // Hook to fetch available metric options for dropdown
-import usePerformanceMetrics from '../../hooks/usePerformanceMetrics'; // Hook to fetch chart data based on selected metrics
-import MetricsFilterDropdown from '../Dropdown/MetricsFilterDropdown';
+import useMetricsFilter from '../../hooks/useMetricsFilter'; // custom hook
+import usePerformanceMetrics from '../../hooks/usePerformanceMetrics'; // custom hook
+import MetricsFilterDropdown from '../Dropdown/MetricsFilterDropdown'; // custom hook
 
-const PerformanceLineChart = () => {
-  const userIdentity = process.env.REACT_APP_USER_IDENTITY;
+const PerformanceLineChart = memo(() => {
+  const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
+
   const [selectedMetrics, setSelectedMetrics] = useState([]);
 
-  // for populating the dropdown options.
   const {
     metricsList: availableMetrics,
     loading: loadingAvailableMetrics,
     error: errorAvailableMetrics,
-  } = useMetricsFilter(userIdentity);
+  } = useMetricsFilter(userIdentityConstant);
 
-  // Use the usePerformanceMetrics hook to fetch the actual chart data.
-  // This hook depends `userIdentity`.
   const {
     chartDataArray,
     loading: loadingChartData,
     error: chartError,
     apiResponseMessage,
-  } = usePerformanceMetrics(selectedMetrics, userIdentity);
-
-  // Ref for handling clicks outside the dropdown to close it.
-  const dropdownRef = useRef(null);
+  } = usePerformanceMetrics(selectedMetrics, userIdentityConstant);
 
   useEffect(() => {
-    // Only set default if availableMetrics are loaded and no metrics are currently selected
     if (availableMetrics.length > 0 && selectedMetrics.length === 0) {
-      // Default to selecting the first three available metrics, or we can adjust as needed.
       const defaultSelected = availableMetrics.slice(0, 3).map((m) => m.code);
       setSelectedMetrics(defaultSelected);
     }
-  }, [availableMetrics]); // Dependency: re-run when availableMetrics list changes
+  }, [availableMetrics, selectedMetrics]);
 
-  // Callback function passed to MetricsFilterDropdown to update `selectedMetrics`.
-
-  const handleMetricsApplied = (metrics) => {
+  const handleMetricsApplied = useCallback((metrics) => {
     setSelectedMetrics(metrics);
-  };
+  }, []);
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 md:p-8 my-6 w-full overflow-hidden relative">
@@ -61,12 +51,11 @@ const PerformanceLineChart = () => {
         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800 border-b-2 border-blue-500 pb-2 flex-grow">
           Metrics Performance Chart
         </h2>
-        {/* Integrate the MetricsFilterDropdown component here */}
-        {/* Pass the necessary props for it to manage its state and communicate selection */}
+
         <MetricsFilterDropdown
           onApplyCallback={handleMetricsApplied}
           initialAppliedMetrics={selectedMetrics}
-          userIdentityConstant={userIdentity}
+          userIdentityConstant={userIdentityConstant}
         />
       </div>
 
@@ -87,7 +76,7 @@ const PerformanceLineChart = () => {
         >
           <strong className="font-bold">Error!</strong>
           <span className="block sm:inline ml-2">{chartError}</span>
-          {/* Button to clear the error message */}
+
           <button
             type="button"
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
@@ -152,7 +141,6 @@ const PerformanceLineChart = () => {
           </ResponsiveContainer>
         </div>
       ) : (
-        // Display message if no data is available after loading and without errors
         !loadingChartData &&
         !chartError && (
           <p className="text-gray-600 col-span-full text-center py-8">
@@ -163,7 +151,9 @@ const PerformanceLineChart = () => {
       )}
     </div>
   );
-};
+});
+
+PerformanceLineChart.displayName = 'PerformanceLineChart';
 
 PerformanceLineChart.propTypes = {};
 
