@@ -7,13 +7,16 @@ import { MetricsProvider } from '../context/MetricsContext';
 
 const Dashboard = () => {
   return (
-    <MainLayout>
-      <MetricsProvider>
+    // <MainLayout>
+
+    <MetricsProvider>
+      <div className="w-full max-w-full overflow-x-hidden">
         <MetricsFilterDropdown />
         <PerformanceLineChart />
         <HeatMapTable />
-      </MetricsProvider>
-    </MainLayout>
+      </div>
+    </MetricsProvider>
+    // </MainLayout>
   );
 };
 
