@@ -2,19 +2,35 @@ import { useState, useEffect } from 'react';
 import api from '../utils/services/api';
 import { heatmapMetrics } from '../utils/constants/heatmapMetricsConstant';
 
+/**
+ * Custom React Hook: useHeatmapData
+ *
+ * This hook fetches, processes, and manages the state for heatmap data.
+ *
+ * @param {string} userIdentityConstant - The X-USER-IDENTITY header value for API requests.
+ * @returns {{
+ *   heatmapData: Array,
+ *   loading: boolean,
+ *   error: string|null,
+ *   setError: Function,
+ *   apiResponseMessage: string,
+ *   metricRanges: Object
+ * }}
+ */
 const useHeatmapData = (userIdentityConstant) => {
   const [heatmapData, setHeatmapData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Now directly expose setError
+  const [error, setError] = useState(null);
   const [apiResponseMessage, setApiResponseMessage] = useState('');
   const [metricRanges, setMetricRanges] = useState({});
 
   const metricsToSend = heatmapMetrics.map((metric) => metric.value);
 
+  // Fetch heatmap data from API
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null); // Clear error on new fetch attempt
+      setError(null);
       setApiResponseMessage('');
       setHeatmapData([]);
 
@@ -33,11 +49,11 @@ const useHeatmapData = (userIdentityConstant) => {
           },
         );
 
-        if (response.data && response.data.message) {
+        if (response.data?.message) {
           setApiResponseMessage(response.data.message);
         }
 
-        if (response.data && Array.isArray(response.data.result)) {
+        if (Array.isArray(response.data?.result)) {
           const sortedData = [...response.data.result].sort(
             (a, b) => a.weekNumber - b.weekNumber,
           );
@@ -45,34 +61,25 @@ const useHeatmapData = (userIdentityConstant) => {
         } else {
           setHeatmapData([]);
           setError(
-            response.data.message ||
-              'API returned an unexpected data format or no "result" array for heatmap.',
+            response.data?.message ||
+              'API returned an unexpected data format or missing "result" array.',
           );
         }
       } catch (err) {
         if (err.response) {
           setError(
-            err.response.data.message ||
+            err.response.data?.message ||
               'Failed to fetch heatmap data from the server.',
           );
-          console.error(
-            'useHeatmapData Hook - API Error Response:',
-            err.response.data,
-          );
+          console.error('API Error Response:', err.response.data);
         } else if (err.request) {
           setError('Network error: No response received for heatmap data.');
-          console.error(
-            'useHeatmapData Hook - Network Request Error:',
-            err.request,
-          );
+          console.error('Network Request Error:', err.request);
         } else {
           setError(
             'An unexpected error occurred while setting up the heatmap data request.',
           );
-          console.error(
-            'useHeatmapData Hook - Request Setup Error:',
-            err.message,
-          );
+          console.error('Request Setup Error:', err.message);
         }
         setHeatmapData([]);
       } finally {
@@ -80,10 +87,15 @@ const useHeatmapData = (userIdentityConstant) => {
       }
     };
 
-    fetchData();
+    if (userIdentityConstant) {
+      fetchData();
+    }
   }, [userIdentityConstant]);
 
+  // Compute min/max for each metric for color scaling
   useEffect(() => {
+    if (loading || heatmapData.length === 0) return;
+
     const newMetricRanges = {};
 
     heatmapMetrics.forEach((metric) => {
@@ -91,13 +103,16 @@ const useHeatmapData = (userIdentityConstant) => {
       let currentMax = -Infinity;
 
       heatmapData.forEach((day) => {
-        day.Hourly_Data.forEach((hour) => {
-          const value = hour[metric.value];
-          if (typeof value === 'number' && !isNaN(value)) {
-            currentMin = Math.min(currentMin, value);
-            currentMax = Math.max(currentMax, value);
-          }
-        });
+        if (Array.isArray(day.Hourly_Data)) {
+          day.Hourly_Data.forEach((hour) => {
+            const value = hour[metric.value];
+            if (typeof value === 'number' && !isNaN(value)) {
+              currentMin = Math.min(currentMin, value);
+              currentMax = Math.max(currentMax, value);
+            }
+          });
+        }
+
         const totalValue = day[`Total_${metric.value}`];
         if (typeof totalValue === 'number' && !isNaN(totalValue)) {
           currentMin = Math.min(currentMin, totalValue);
@@ -110,10 +125,10 @@ const useHeatmapData = (userIdentityConstant) => {
         max: currentMax === -Infinity ? 0 : currentMax,
       };
     });
-    setMetricRanges(newMetricRanges);
-  }, [heatmapData]);
 
-  // Return setError as well, so the component can clear the error state
+    setMetricRanges(newMetricRanges);
+  }, [heatmapData, loading]);
+
   return {
     heatmapData,
     loading,
