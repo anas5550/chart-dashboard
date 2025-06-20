@@ -5,7 +5,7 @@ import '@mantine/core/styles.css';
 const App = () => {
   return (
     <>
-      <MantineProvider>
+      <MantineProvider withGlobalStyles withNormalizeCSS>
         <AppRouter />
       </MantineProvider>
     </>
