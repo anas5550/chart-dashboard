@@ -1,137 +1,98 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import useMetricsFilter from '../../hooks/useMetricsFilter';
+import { useMetricsContext } from '../../context/MetricsContext';
 
-const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
+const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
+  const { selectedMetrics, setSelectedMetrics } = useMetricsContext();
   const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
   const { metricsList, loading, error } =
-    useMetricsFilter(userIdentityConstant); // hook to fetch the metrics filter options
+    useMetricsFilter(userIdentityConstant);
 
-  const [selectedMetrics, setSelectedMetrics] = useState(
+  const [localSelection, setLocalSelection] = useState(
     initialAppliedMetrics || [],
   );
-
-  const [appliedMetrics, setAppliedMetrics] = useState(
-    initialAppliedMetrics || [],
-  );
-
   const [isOpen, setIsOpen] = useState(false);
-
   const dropdownRef = useRef(null);
 
+  // Sync context state with local state on metrics fetch
   useEffect(() => {
-    if (
-      JSON.stringify(initialAppliedMetrics) !== JSON.stringify(appliedMetrics)
-    ) {
-      setAppliedMetrics(initialAppliedMetrics);
-      setSelectedMetrics(initialAppliedMetrics);
+    if (metricsList.length > 0 && selectedMetrics.length === 0) {
+      const allCodes = metricsList.map((m) => m.code);
+      setSelectedMetrics(allCodes);
+      setLocalSelection(allCodes);
     }
-  }, [initialAppliedMetrics, appliedMetrics]);
+  }, [metricsList]);
 
-  useEffect(() => {
-    if (metricsList.length > 0) {
-      if (initialAppliedMetrics && initialAppliedMetrics.length > 0) {
-        setSelectedMetrics(initialAppliedMetrics);
-        setAppliedMetrics(initialAppliedMetrics);
-      } else if (appliedMetrics.length === 0) {
-        const allFetchedCodes = metricsList.map((m) => m.code);
-        setSelectedMetrics(allFetchedCodes);
-        setAppliedMetrics(allFetchedCodes);
-        onApplyCallback(allFetchedCodes);
-      }
-    } else if (
-      metricsList.length === 0 &&
-      !loading &&
-      !error &&
-      appliedMetrics.length > 0
-    ) {
-      setAppliedMetrics([]);
-      setSelectedMetrics([]);
-      onApplyCallback([]);
-    }
-  }, [metricsList, initialAppliedMetrics, loading, error, onApplyCallback]);
+  // Sync local UI state with context when dropdown opens
+  const toggleDropdown = () => {
+    if (!isOpen) setLocalSelection(selectedMetrics);
+    setIsOpen((prev) => !prev);
+  };
+
+  const handleCheckboxChange = (code) => {
+    setLocalSelection((prev) =>
+      prev.includes(code)
+        ? prev.filter((item) => item !== code)
+        : [...prev, code],
+    );
+  };
+
+  const handleApply = () => {
+    setSelectedMetrics(localSelection);
+    setIsOpen(false);
+  };
+
+  const handleCancel = () => {
+    setLocalSelection(selectedMetrics);
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        if (isOpen) {
-          handleCancel();
-        }
+        if (isOpen) handleCancel();
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, appliedMetrics]);
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-
-    if (!isOpen) {
-      setSelectedMetrics(appliedMetrics);
-    }
-  };
-
-  const handleCheckboxChange = (code) => {
-    setSelectedMetrics((prevSelected) => {
-      if (prevSelected.includes(code)) {
-        return prevSelected.filter((item) => item !== code);
-      }
-      return [...prevSelected, code];
-    });
-  };
-
-  const handleApply = () => {
-    setAppliedMetrics(selectedMetrics);
-    setIsOpen(false);
-    onApplyCallback(selectedMetrics);
-  };
-
-  const handleCancel = () => {
-    setSelectedMetrics(appliedMetrics);
-    setIsOpen(false);
-  };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, selectedMetrics]);
 
   return (
-    <div
-      className="relative inline-block w-full sm:w-auto z-10"
-      ref={dropdownRef}
-    >
+    <div className="relative w-full sm:w-auto z-10" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="bg-green-600 text-white px-6 my-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 text-base font-medium shadow-md flex items-center justify-center w-full sm:w-auto"
+        className="bg-green-600 text-white px-6 py-2 my-4 w-full sm:w-auto rounded-md text-base font-medium shadow-md flex items-center justify-center hover:bg-green-700 transition-colors"
       >
-        Select Metrics ({appliedMetrics.length})
+        Select Metrics ({selectedMetrics.length})
         <svg
-          className={`ml-2 h-4 w-4 transform ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-200`}
+          className={`ml-2 h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
             d="M19 9l-7 7-7-7"
-          ></path>
+          />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-full sm:w-64 bg-white rounded-md shadow-xl border border-gray-200 py-2 max-h-80 overflow-y-auto">
-          <div className="px-4 py-2 text-sm text-gray-500 border-b">
+        <div className="absolute left-0 mt-2 w-full sm:w-72 bg-white border border-gray-200 rounded-md shadow-xl py-2 max-h-80 overflow-y-auto">
+          <div className="px-4 py-2 text-sm text-gray-600 border-b">
             Select desired metrics:
           </div>
+
           {loading ? (
-            <div className="flex items-center justify-center h-20">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-              <p className="ml-2 text-sm text-gray-600">Loading...</p>
+            <div className="flex justify-center items-center py-4">
+              <div className="h-6 w-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-3 text-sm text-gray-500">Loading...</span>
             </div>
           ) : error ? (
-            <p className="px-4 py-2 text-red-600 text-sm">Error: {error}</p>
+            <p className="px-4 py-2 text-sm text-red-600">Error: {error}</p>
           ) : metricsList.length > 0 ? (
             metricsList.map((metric) => (
               <label
@@ -141,9 +102,9 @@ const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
                 <input
                   type="checkbox"
                   value={metric.code}
-                  checked={selectedMetrics.includes(metric.code)}
+                  checked={localSelection.includes(metric.code)}
                   onChange={() => handleCheckboxChange(metric.code)}
-                  className="form-checkbox h-4 w-4 text-purple-600 rounded-sm focus:ring-purple-500 transition-colors duration-150"
+                  className="form-checkbox h-4 w-4 text-purple-600 rounded focus:ring-purple-500"
                 />
                 <span className="ml-2 text-gray-800 text-base">
                   {metric.label}
@@ -155,16 +116,17 @@ const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
               No metrics available.
             </p>
           )}
-          <div className="flex justify-center p-2 border-t border-gray-200 space-x-2">
+
+          <div className="flex justify-between gap-2 p-3 border-t border-gray-200">
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors duration-200"
+              className="w-1/2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md py-2 hover:bg-gray-300"
             >
               Cancel
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200"
+              className="w-1/2 text-sm font-medium text-white bg-green-600 rounded-md py-2 hover:bg-green-700"
             >
               Apply
             </button>
@@ -176,9 +138,7 @@ const MetricsFilterDropdown = ({ onApplyCallback, initialAppliedMetrics }) => {
 };
 
 MetricsFilterDropdown.propTypes = {
-  onApplyCallback: PropTypes.func.isRequired,
   initialAppliedMetrics: PropTypes.arrayOf(PropTypes.string),
-  userIdentityConstant: PropTypes.string.isRequired,
 };
 
 MetricsFilterDropdown.defaultProps = {

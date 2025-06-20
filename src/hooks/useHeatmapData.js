@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/services/api';
-import { heatmapMetrics } from '../utils/constants/heatmapMetricsConstant';
+import { useMetricsContext } from '../context/MetricsContext'; // <-- add this
 
 const useHeatmapData = (userIdentityConstant) => {
   const [heatmapData, setHeatmapData] = useState([]);
@@ -9,9 +9,9 @@ const useHeatmapData = (userIdentityConstant) => {
   const [apiResponseMessage, setApiResponseMessage] = useState('');
   const [metricRanges, setMetricRanges] = useState({});
 
-  const metricsToSend = heatmapMetrics.map((metric) => metric.value);
+  const { selectedMetrics } = useMetricsContext(); // ✅ use context
+  const metricsToSend = selectedMetrics || [];
 
-  // Fetch heatmap data from API
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -47,24 +47,22 @@ const useHeatmapData = (userIdentityConstant) => {
           setHeatmapData([]);
           setError(
             response.data?.message ||
-              'API returned an unexpected data format or missing "result" array.',
+              'API returned unexpected format or missing "result".',
           );
         }
       } catch (err) {
         if (err.response) {
           setError(
             err.response.data?.message ||
-              'Failed to fetch heatmap data from the server.',
+              'Failed to fetch heatmap data from server.',
           );
           console.error('API Error Response:', err.response.data);
         } else if (err.request) {
-          setError('Network error: No response received for heatmap data.');
-          console.error('Network Request Error:', err.request);
+          setError('Network error: No response received.');
+          console.error('Request Error:', err.request);
         } else {
-          setError(
-            'An unexpected error occurred while setting up the heatmap data request.',
-          );
-          console.error('Request Setup Error:', err.message);
+          setError('Unexpected error while setting up request.');
+          console.error('Setup Error:', err.message);
         }
         setHeatmapData([]);
       } finally {
@@ -72,25 +70,25 @@ const useHeatmapData = (userIdentityConstant) => {
       }
     };
 
-    if (userIdentityConstant) {
+    if (userIdentityConstant && metricsToSend.length > 0) {
       fetchData();
     }
-  }, [userIdentityConstant]);
+  }, [userIdentityConstant, JSON.stringify(metricsToSend)]);
 
-  // Compute min/max for each metric for color scaling
   useEffect(() => {
-    if (loading || heatmapData.length === 0) return;
+    if (loading || heatmapData.length === 0 || metricsToSend.length === 0)
+      return;
 
     const newMetricRanges = {};
 
-    heatmapMetrics.forEach((metric) => {
+    metricsToSend.forEach((metric) => {
       let currentMin = Infinity;
       let currentMax = -Infinity;
 
       heatmapData.forEach((day) => {
         if (Array.isArray(day.Hourly_Data)) {
           day.Hourly_Data.forEach((hour) => {
-            const value = hour[metric.value];
+            const value = hour[metric];
             if (typeof value === 'number' && !isNaN(value)) {
               currentMin = Math.min(currentMin, value);
               currentMax = Math.max(currentMax, value);
@@ -98,21 +96,21 @@ const useHeatmapData = (userIdentityConstant) => {
           });
         }
 
-        const totalValue = day[`Total_${metric.value}`];
+        const totalValue = day[`Total_${metric}`];
         if (typeof totalValue === 'number' && !isNaN(totalValue)) {
           currentMin = Math.min(currentMin, totalValue);
           currentMax = Math.max(currentMax, totalValue);
         }
       });
 
-      newMetricRanges[metric.value] = {
+      newMetricRanges[metric] = {
         min: currentMin === Infinity ? 0 : currentMin,
         max: currentMax === -Infinity ? 0 : currentMax,
       };
     });
 
     setMetricRanges(newMetricRanges);
-  }, [heatmapData, loading]);
+  }, [heatmapData, loading, JSON.stringify(metricsToSend)]);
 
   return {
     heatmapData,

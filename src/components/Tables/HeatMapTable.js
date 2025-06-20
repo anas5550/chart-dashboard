@@ -12,12 +12,14 @@ import {
 import { IconAlertCircle } from '@tabler/icons-react';
 
 import useHeatmapData from '../../hooks/useHeatmapData';
-import { heatmapMetrics } from '../../utils/constants/heatmapMetricsConstant';
+import { useMetricsContext } from '../../context/MetricsContext';
 import { daysOfWeek } from '../../utils/constants/daysOfWeekConstant';
+import { heatmapMetrics } from '../../utils/constants/heatmapMetricsConstant';
 
 const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;
 
 const HeatMapTable = memo(() => {
+  const { selectedMetrics } = useMetricsContext();
   const {
     heatmapData,
     loading,
@@ -80,6 +82,20 @@ const HeatMapTable = memo(() => {
     borderRight: `1px solid var(--mantine-color-gray-2)`,
   };
 
+  // ✅ fallback to full heatmapMetrics if selectedMetrics is empty
+  const metricsToRender = selectedMetrics?.length
+    ? selectedMetrics
+    : heatmapMetrics.map((m) => m.value);
+
+  // ✅ map value-to-label for display
+  const metricLabelMap = useMemo(() => {
+    const map = {};
+    heatmapMetrics.forEach(({ label, value }) => {
+      map[value] = label;
+    });
+    return map;
+  }, []);
+
   return (
     <Box className="bg-white shadow-md rounded-lg p-4 w-full overflow-x-auto">
       <Title order={2} mb="xs">
@@ -122,7 +138,7 @@ const HeatMapTable = memo(() => {
                 {daysOfWeek.map((day) => (
                   <th
                     key={day}
-                    colSpan={heatmapMetrics.length}
+                    colSpan={metricsToRender.length}
                     style={{ textAlign: 'center' }}
                   >
                     {day}
@@ -132,12 +148,12 @@ const HeatMapTable = memo(() => {
               <tr>
                 <th style={{ ...stickyHeader, minWidth: rem(80) }}></th>
                 {daysOfWeek.map((day) =>
-                  heatmapMetrics.map((metric) => (
+                  metricsToRender.map((metric) => (
                     <th
-                      key={`${day}-${metric.value}`}
+                      key={`${day}-${metric}`}
                       style={{ textAlign: 'center' }}
                     >
-                      {metric.label.replace('_perc', '%')}
+                      {metricLabelMap[metric] || metric}
                     </th>
                   )),
                 )}
@@ -156,19 +172,19 @@ const HeatMapTable = memo(() => {
                     const hourData = currentDay?.Hourly_Data?.find(
                       (h) => h.time_part === hour,
                     );
-                    return heatmapMetrics.map((metric) => {
-                      const value = hourData?.[metric.value];
+                    return metricsToRender.map((metric) => {
+                      const value = hourData?.[metric];
                       return (
                         <td
-                          key={`${day}-${hour}-${metric.value}`}
+                          key={`${day}-${hour}-${metric}`}
                           style={{
-                            backgroundColor: getCellColor(value, metric.value),
+                            backgroundColor: getCellColor(value, metric),
                             textAlign: 'center',
                             padding: '0.4rem',
                           }}
                           title={
                             value != null
-                              ? `${metric.label}: ${value.toFixed(2)}`
+                              ? `${metricLabelMap[metric] || metric}: ${value.toFixed(2)}`
                               : 'N/A'
                           }
                         >
