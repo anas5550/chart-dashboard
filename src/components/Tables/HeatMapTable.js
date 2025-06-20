@@ -43,6 +43,8 @@ const HeatMapTable = memo(() => {
     return hour < 12 ? `${hour}am` : `${hour - 12}pm`;
   }, []);
 
+  const reverseMetrics = ['CPC', 'CPM', 'CPO', 'ACOS', 'CPA'];
+
   const getCellColor = useCallback(
     (value, metricValue) => {
       const range = metricRanges[metricValue];
@@ -50,15 +52,14 @@ const HeatMapTable = memo(() => {
       if (range.min === range.max) return 'rgb(200,200,200)';
 
       const normalized = (value - range.min) / (range.max - range.min);
-      let r = 255 * (1 - normalized);
-      let g = 255 * normalized;
-      let b = 100 * normalized;
+      const isReversed = reverseMetrics.includes(metricValue);
+      const factor = isReversed ? normalized : 1 - normalized;
 
-      if (['CPC', 'CPM', 'CPO', 'ACOS', 'CPA'].includes(metricValue)) {
-        [r, g] = [255 * normalized, 255 * (1 - normalized)];
-      }
+      const r = Math.round(255 * factor);
+      const g = Math.round(255 * (1 - factor));
+      const b = Math.round(100 * (1 - factor));
 
-      return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+      return `rgb(${r},${g},${b})`;
     },
     [metricRanges],
   );
@@ -80,7 +81,7 @@ const HeatMapTable = memo(() => {
   };
 
   return (
-    <Box className="bg-white shadow-md rounded-lg p-4">
+    <Box className="bg-white shadow-md rounded-lg p-4 w-full overflow-x-auto">
       <Title order={2} mb="xs">
         Heat Map
       </Title>
@@ -89,7 +90,7 @@ const HeatMapTable = memo(() => {
       </Text>
 
       {loading ? (
-        <Center h={300}>
+        <Center h={300} className="flex flex-col">
           <Loader />
           <Text size="sm" mt="sm" c="gray.6">
             Loading heatmap...
@@ -106,13 +107,14 @@ const HeatMapTable = memo(() => {
           {error}
         </Alert>
       ) : (
-        <Box style={{ maxHeight: '600px', overflow: 'auto' }}>
+        <Box className="max-h-[600px] overflow-auto w-full">
           <Table
             highlightOnHover
             striped
             withTableBorder
             withColumnBorders
             fz="xs"
+            className="min-w-[1000px]"
           >
             <thead>
               <tr>
@@ -143,7 +145,7 @@ const HeatMapTable = memo(() => {
             </thead>
             <tbody>
               {hoursOfDay.map((hour) => (
-                <tr key={hour}>
+                <tr key={hour} className="even:bg-gray-50">
                   <td style={{ ...stickyCell, minWidth: rem(80) }}>
                     {formatHour(hour)}
                   </td>

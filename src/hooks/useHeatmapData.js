@@ -2,21 +2,6 @@ import { useState, useEffect } from 'react';
 import api from '../utils/services/api';
 import { heatmapMetrics } from '../utils/constants/heatmapMetricsConstant';
 
-/**
- * Custom React Hook: useHeatmapData
- *
- * This hook fetches, processes, and manages the state for heatmap data.
- *
- * @param {string} userIdentityConstant - The X-USER-IDENTITY header value for API requests.
- * @returns {{
- *   heatmapData: Array,
- *   loading: boolean,
- *   error: string|null,
- *   setError: Function,
- *   apiResponseMessage: string,
- *   metricRanges: Object
- * }}
- */
 const useHeatmapData = (userIdentityConstant) => {
   const [heatmapData, setHeatmapData] = useState([]);
   const [loading, setLoading] = useState(true);
