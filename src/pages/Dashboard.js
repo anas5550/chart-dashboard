@@ -13,7 +13,7 @@ const Dashboard = () => {
       <div className="w-full max-w-full overflow-x-hidden">
         <MetricsFilterDropdown />
         <PerformanceLineChart />
-        {/* <HeatMapTable /> */}
+        <HeatMapTable />
       </div>
     </MetricsProvider>
     // </MainLayout>
