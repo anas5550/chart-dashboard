@@ -47,7 +47,7 @@ const useMetricsFilter = (userIdentityConstant) => {
     };
 
     fetchMetrics();
-  }, [userIdentityConstant]); // Re-fetch if the identity constant changes
+  }, [userIdentityConstant]);
 
   return { metricsList, loading, error };
 };
