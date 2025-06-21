@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/chart-dashboard/static/css/main.bc7e4e29.css",
-    "main.js": "/chart-dashboard/static/js/main.042807a6.js",
-    "static/js/453.c4405677.chunk.js": "/chart-dashboard/static/js/453.c4405677.chunk.js",
+    "main.css": "/chart-dashboard/static/css/main.54468a50.css",
+    "main.js": "/chart-dashboard/static/js/main.90c36949.js",
+    "static/js/453.ff9ce6e5.chunk.js": "/chart-dashboard/static/js/453.ff9ce6e5.chunk.js",
     "static/media/logo.svg": "/chart-dashboard/static/media/logo.bd5e6cff162413ea31a4ed38ea84b8d0.svg",
     "index.html": "/chart-dashboard/index.html",
-    "main.bc7e4e29.css.map": "/chart-dashboard/static/css/main.bc7e4e29.css.map",
-    "main.042807a6.js.map": "/chart-dashboard/static/js/main.042807a6.js.map",
-    "453.c4405677.chunk.js.map": "/chart-dashboard/static/js/453.c4405677.chunk.js.map"
+    "main.54468a50.css.map": "/chart-dashboard/static/css/main.54468a50.css.map",
+    "main.90c36949.js.map": "/chart-dashboard/static/js/main.90c36949.js.map",
+    "453.ff9ce6e5.chunk.js.map": "/chart-dashboard/static/js/453.ff9ce6e5.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.bc7e4e29.css",
-    "static/js/main.042807a6.js"
+    "static/css/main.54468a50.css",
+    "static/js/main.90c36949.js"
   ]
 }
