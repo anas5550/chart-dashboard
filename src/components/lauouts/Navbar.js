@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { FiUser, FiLogOut } from 'react-icons/fi';
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs';
 import { toggleFullscreen } from '../../utils/toggleFullscreen';
+import useLogout from '../../hooks/useLogout';
 
 const Navbar = ({ sidebarExpanded }) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const logOut = useLogout();
 
   return (
     <nav
@@ -46,7 +48,7 @@ const Navbar = ({ sidebarExpanded }) => {
                 Anas Siddiqui
               </div>
               <button
-                onClick={() => alert('Logged out')} // replace with real logout logic
+                onClick={() => logOut()} // replace with real logout logic
                 className="w-full flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100"
               >
                 <FiLogOut className="mr-2" />
