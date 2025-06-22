@@ -25,7 +25,7 @@ const useLogin = () => {
       const receivedUserIdentity =
         response.data.userIdentity ||
         response.data.xIdentity ||
-        response.data.your_user_identity_field; // <=== ADJUST THIS LINE
+        response.data.your_user_identity_field;
 
       if (receivedToken) {
         localStorage.setItem('authToken', receivedToken);

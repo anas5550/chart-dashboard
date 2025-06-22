@@ -2,137 +2,168 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import useMetricsFilter from '../../hooks/useMetricsFilter';
 import { useMetricsContext } from '../../context/MetricsContext';
+import {
+  Button as MantineButton,
+  useCombobox,
+  Combobox,
+  InputBase,
+  ScrollArea,
+  Checkbox,
+  Group,
+  Transition,
+} from '@mantine/core';
 
+//
 const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
   const { selectedMetrics, setSelectedMetrics } = useMetricsContext();
   const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
   const { metricsList, loading, error } =
     useMetricsFilter(userIdentityConstant);
 
+  const [options, setOptions] = useState([]);
+  const [search, setSearch] = useState('');
   const [localSelection, setLocalSelection] = useState(
     initialAppliedMetrics || [],
   );
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [snapshot, setSnapshot] = useState([]);
 
-  // Sync context state with local state on metrics fetch
+  const wasApplied = useRef(false);
+
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
   useEffect(() => {
     if (metricsList.length > 0 && selectedMetrics.length === 0) {
-      const allCodes = metricsList.map((m) => m.code);
-      setSelectedMetrics(allCodes);
-      setLocalSelection(allCodes);
+      const defaultCodes = metricsList.slice(0, 4).map((m) => m.code);
+      const mappedOptions = metricsList.map((m) => ({
+        value: m.code,
+        label: m.label,
+      }));
+
+      setOptions(mappedOptions);
+      setSelectedMetrics(defaultCodes);
+      setLocalSelection(defaultCodes);
     }
   }, [metricsList]);
 
-  // Sync local UI state with context when dropdown opens
-  const toggleDropdown = () => {
-    if (!isOpen) setLocalSelection(selectedMetrics);
-    setIsOpen((prev) => !prev);
-  };
-
-  const handleCheckboxChange = (code) => {
-    setLocalSelection((prev) =>
-      prev.includes(code)
-        ? prev.filter((item) => item !== code)
-        : [...prev, code],
+  const handleOptionToggle = (val) => {
+    setLocalSelection((current) =>
+      current.includes(val)
+        ? current.filter((v) => v !== val)
+        : [...current, val],
     );
   };
 
-  const handleApply = () => {
-    setSelectedMetrics(localSelection);
-    setIsOpen(false);
-  };
+  const filteredOptions = options.filter((item) =>
+    item.label.toLowerCase().includes(search.toLowerCase().trim()),
+  );
 
-  const handleCancel = () => {
-    setLocalSelection(selectedMetrics);
-    setIsOpen(false);
+  const toggleDropdown = () => {
+    if (!combobox.dropdownOpened) {
+      setSnapshot(localSelection);
+      setSearch('');
+    }
+    combobox.toggleDropdown();
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        if (isOpen) handleCancel();
+    if (!combobox.dropdownOpened) {
+      if (!wasApplied.current) {
+        setLocalSelection(snapshot);
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, selectedMetrics]);
+      wasApplied.current = false;
+    }
+  }, [combobox.dropdownOpened]);
 
   return (
-    <div className="relative w-full sm:w-auto z-10" ref={dropdownRef}>
-      <button
-        onClick={toggleDropdown}
-        className="bg-green-600 text-white px-6 py-2 my-4 w-full sm:w-auto rounded-md text-base font-medium shadow-md flex items-center justify-center hover:bg-green-700 transition-colors"
+    <div className="w-full sm:w-auto ml-auto my-4 px-4 sm:px-0 flex justify-end">
+      <Combobox
+        store={combobox}
+        onOptionSubmit={handleOptionToggle}
+        withinPortal
+        position="bottom-end"
+        className="!w-full sm:!w-72 bg-white rounded-xl shadow-xl border border-gray-300"
       >
-        Select Metrics ({selectedMetrics.length})
-        <svg
-          className={`ml-2 h-4 w-4 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <Combobox.Target>
+          <InputBase
+            onClick={toggleDropdown}
+            component="button"
+            type="button"
+            pointer
+            rightSection={<Combobox.Chevron />}
+            rightSectionPointerEvents="none"
+            className="w-full sm:w-72"
+            size="md"
+            radius="md"
+            variant="filled"
+            color="violet"
+          >
+            <span className="text-gray-700">Select metrics</span>
+          </InputBase>
+        </Combobox.Target>
+
+        <Transition
+          mounted={combobox.dropdownOpened}
+          transition="pop"
+          duration={180}
+          timingFunction="ease"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
+          {(styles) => (
+            <Combobox.Dropdown
+              className="w-full sm:w-72 bg-white rounded-xl shadow-xl border border-gray-300"
+              style={{ maxWidth: '100vw', overflowWrap: 'break-word' }}
+            >
+              <Combobox.Search
+                value={search}
+                onChange={(event) => setSearch(event.currentTarget.value)}
+                placeholder="Search..."
+              />
 
-      {isOpen && (
-        <div className="absolute left-0 mt-2 w-full sm:w-72 bg-white border border-gray-200 rounded-md shadow-xl py-2 max-h-80 overflow-y-auto">
-          <div className="px-4 py-2 text-sm text-gray-600 border-b">
-            Select desired metrics:
-          </div>
+              <ScrollArea.Autosize mah={200} type="scroll">
+                <Combobox.Options>
+                  {filteredOptions.map((item) => (
+                    <Combobox.Option value={item.value} key={item.value}>
+                      <Group className="px-1 py-1.5">
+                        <Checkbox
+                          checked={localSelection.includes(item.value)}
+                          label={item.label}
+                          pointer
+                          size="sm"
+                          color="violet"
+                          readOnly
+                        />
+                      </Group>
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              </ScrollArea.Autosize>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-4">
-              <div className="h-6 w-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-              <span className="ml-3 text-sm text-gray-500">Loading...</span>
-            </div>
-          ) : error ? (
-            <p className="px-4 py-2 text-sm text-red-600">Error: {error}</p>
-          ) : metricsList.length > 0 ? (
-            metricsList.map((metric) => (
-              <label
-                key={metric.code}
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  value={metric.code}
-                  checked={localSelection.includes(metric.code)}
-                  onChange={() => handleCheckboxChange(metric.code)}
-                  className="form-checkbox h-4 w-4 text-purple-600 rounded focus:ring-purple-500"
-                />
-                <span className="ml-2 text-gray-800 text-base">
-                  {metric.label}
-                </span>
-              </label>
-            ))
-          ) : (
-            <p className="px-4 py-2 text-gray-600 text-sm">
-              No metrics available.
-            </p>
+              <div className="border-t border-gray-200 px-3 py-2 flex justify-between gap-2 bg-white">
+                <button
+                  onClick={() => {
+                    setLocalSelection(snapshot);
+                    combobox.closeDropdown();
+                  }}
+                  className="w-1/2 text-sm bg-gray-200 hover:bg-gray-300 rounded px-3 py-1.5 text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedMetrics(localSelection);
+                    wasApplied.current = true;
+                    combobox.closeDropdown();
+                  }}
+                  className="w-1/2 text-sm bg-violet-600 hover:bg-violet-700 text-white rounded px-3 py-1.5"
+                >
+                  Apply
+                </button>
+              </div>
+            </Combobox.Dropdown>
           )}
-
-          <div className="flex justify-between gap-2 p-3 border-t border-gray-200">
-            <button
-              onClick={handleCancel}
-              className="w-1/2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md py-2 hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleApply}
-              className="w-1/2 text-sm font-medium text-white bg-green-600 rounded-md py-2 hover:bg-green-700"
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      )}
+        </Transition>
+      </Combobox>
     </div>
   );
 };

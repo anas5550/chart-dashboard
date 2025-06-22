@@ -6,7 +6,7 @@ import useLogin from '../../hooks/useLogin';
 const Login = () => {
   // custom hook for login
   const { login, loginError, authToken, isLoading } = useLogin();
-
+  // un-comment it for hard coded values of login
   // const initialValues = {
   //   email: 'test@dev.com',
   //   password: '#Test@123',

@@ -1,36 +1,118 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { CiHome } from 'react-icons/ci';
+import React, { useState } from 'react';
+import { Button } from '@mantine/core';
+import { AiOutlineDashboard, AiFillDashboard } from 'react-icons/ai';
+import { FaCog } from 'react-icons/fa';
 import PropTypes from 'prop-types';
-import LOGO from '../../assets/logo.svg';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ logoSrc }) => {
+  const [sidebarHovered, setSidebarHovered] = useState(false);
+  const [dashboardHover, setDashboardHover] = useState(false);
+  const [settingsHover, setSettingsHover] = useState(false);
+
+  const navigate = useNavigate();
+
   return (
-    <aside className="group w-20 hover:w-64 transition-all duration-300 ease-in-out bg-white shadow-md flex flex-col fixed h-screen z-30 overflow-hidden">
-      <div className="h-16 flex items-center justify-center font-bold text-blue-600 text-xl border-b overflow-hidden">
-        <img
-          src={logoSrc}
-          alt="Company Logo"
-          className="w-full h-full object-contain group-hover:hidden transition-opacity duration-300 bg-black"
-        />
-        <span className="hidden group-hover:flex items-center justify-center w-full text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-gray-800 text-2xl font-semibold">
-          TechSavvy
-        </span>
+    <aside
+      className={`fixed top-0 left-0 z-50 h-screen bg-white shadow-md flex flex-col justify-between transition-all duration-300
+        ${sidebarHovered ? 'w-64' : 'w-16'}
+      `}
+      onMouseEnter={() => setSidebarHovered(true)}
+      onMouseLeave={() => setSidebarHovered(false)}
+    >
+      {/* Top Section */}
+      <div className="p-4">
+        {/* Logo */}
+        <div className="w-full h-16 flex items-center justify-center overflow-hidden">
+          {sidebarHovered ? (
+            <img
+              src={logoSrc}
+              alt="Logo"
+              className="w-full h-full object-cover rounded bg-black"
+            />
+          ) : (
+            <span className="text-xl font-bold text-violet-600">TS</span>
+          )}
+        </div>
+
+        {/* Divider */}
+        <hr className="my-4 border-gray-200" />
+
+        {/* Dashboard Button */}
+        <div
+          onMouseEnter={() => setDashboardHover(true)}
+          onMouseLeave={() => setDashboardHover(false)}
+        >
+          <Button
+            fullWidth
+            onClick={() => navigate('/dashboard')}
+            leftSection={
+              dashboardHover ? (
+                <AiFillDashboard size={20} />
+              ) : (
+                <AiOutlineDashboard size={20} />
+              )
+            }
+            color="violet"
+            variant="light"
+            className="justify-start"
+            styles={{
+              root: {
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+                height: '40px',
+                fontSize: sidebarHovered ? '14px' : '0px',
+                transition: 'all 0.3s',
+              },
+              section: {
+                marginRight: sidebarHovered ? '10px' : '0px',
+              },
+            }}
+          >
+            {sidebarHovered && 'Dashboard'}
+          </Button>
+        </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-4 text-gray-700">
-        <Link
-          to="/"
-          className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200 group"
+      {/* Bottom Section */}
+      <div className="p-4">
+        <hr className="mb-4 border-gray-200" />
+
+        <div
+          onMouseEnter={() => setSettingsHover(true)}
+          onMouseLeave={() => setSettingsHover(false)}
         >
-          <span className="w-6 h-6 flex items-center justify-center text-blue-600 group-hover:text-blue-700 transition-colors duration-200">
-            <CiHome className="w-5 h-5" />
-          </span>
-          <span className="hidden group-hover:block whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
-            Home
-          </span>
-        </Link>
-      </nav>
+          <Button
+            fullWidth
+            leftSection={
+              <FaCog
+                size={18}
+                className={`${
+                  settingsHover
+                    ? 'rotate-90 transition-transform duration-300'
+                    : ''
+                }`}
+              />
+            }
+            variant="subtle"
+            color="gray"
+            className="justify-start"
+            styles={{
+              root: {
+                paddingLeft: sidebarHovered ? '1rem' : '0.5rem',
+                fontSize: sidebarHovered ? '14px' : '0px',
+                height: '38px',
+                transition: 'all 0.3s',
+              },
+              section: {
+                marginRight: sidebarHovered ? '10px' : '0px',
+              },
+            }}
+          >
+            {sidebarHovered && 'Settings'}
+          </Button>
+        </div>
+      </div>
     </aside>
   );
 };

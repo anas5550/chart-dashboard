@@ -1,3 +1,4 @@
+// HeatMapTable.jsx
 import React, { useMemo, useCallback, memo } from 'react';
 import {
   Box,
@@ -18,9 +19,13 @@ import {
   reverseMetrics,
 } from '../../utils/constants/heatmapMetricsConstant';
 import { daysOfWeek } from '../../utils/constants/daysOfWeekConstant';
+import {
+  getCellColor,
+  getTextColor,
+  formatHour,
+} from '../../utils/heatmapUtils';
 
 const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;
-/////
 
 const HeatMapTable = memo(() => {
   const { selectedMetrics } = useMetricsContext();
@@ -36,48 +41,28 @@ const HeatMapTable = memo(() => {
     [],
   );
 
-  const formatHour = useCallback((hourString) => {
-    const hour = parseInt(hourString.slice(0, 2), 10);
-    if (hour === 0) return '12am';
-    if (hour === 12) return '12pm';
-    return hour < 12 ? `${hour}am` : `${hour - 12}pm`;
-  }, []);
-
-  const getCellColor = useCallback(
-    (value, metricValue) => {
-      const range = metricRanges[metricValue];
-      if (!range || value == null || isNaN(value)) return 'rgb(240,240,240)';
-      if (range.min === range.max) return 'rgb(200,200,200)';
-
-      const normalized = (value - range.min) / (range.max - range.min);
-      const isReversed = reverseMetrics.includes(metricValue);
-      const factor = isReversed ? 1 - normalized : normalized;
-
-      const r = Math.round(255 * (1 - factor));
-      const g = Math.round(255 * (1 - factor));
-      const b = Math.round(100 + 100 * factor);
-
-      return `rgb(${r},${g},${b})`;
-    },
-    [metricRanges],
-  );
-
   const stickyHeader = {
     position: 'sticky',
     left: 0,
     zIndex: 30,
     backgroundColor: 'white',
-    borderRight: `1px solid var(--mantine-color-gray-3)`,
+    borderRight: '1px solid var(--mantine-color-gray-3)',
     boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+    paddingLeft: '0.75rem',
+    paddingRight: '0.75rem',
+    backgroundClip: 'padding-box',
   };
 
   const stickyCell = {
     position: 'sticky',
     left: 0,
-    zIndex: 20,
+    // zIndex: 20,
     backgroundColor: 'white',
-    borderRight: `1px solid var(--mantine-color-gray-2)`,
+    borderRight: '1px solid var(--mantine-color-gray-2)',
     boxShadow: '2px 0 4px rgba(0,0,0,0.05)',
+    paddingLeft: '0.75rem',
+    paddingRight: '0.75rem',
+    backgroundClip: 'padding-box',
   };
 
   const metricsToRender = selectedMetrics?.length
@@ -85,26 +70,34 @@ const HeatMapTable = memo(() => {
     : heatmapMetrics.map((m) => m.value);
 
   const metricLabelMap = useMemo(() => {
-    const map = {};
-    heatmapMetrics.forEach(({ label, value }) => {
-      map[value] = label;
-    });
-    return map;
+    return heatmapMetrics.reduce((acc, { label, value }) => {
+      acc[value] = label;
+      return acc;
+    }, {});
   }, []);
 
-  const getTextColor = (backgroundColor) => {
-    const match = backgroundColor.match(/\d+/g);
-    if (!match) return 'black';
-    const [r, g, b] = match.map(Number);
-
-    // Calculate luminance
-    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-    return luminance > 150 ? 'black' : 'white';
-  };
+  const totalRow = useMemo(() => {
+    const totals = {};
+    daysOfWeek.forEach((day) => {
+      const currentDay = heatmapData.find((d) => d.weekday === day);
+      if (currentDay?.Hourly_Data) {
+        metricsToRender.forEach((metric) => {
+          totals[`${day}-${metric}`] = currentDay.Hourly_Data.reduce(
+            (sum, h) => {
+              const val = h[metric];
+              return val != null && !isNaN(val) ? sum + val : sum;
+            },
+            0,
+          );
+        });
+      }
+    });
+    return totals;
+  }, [heatmapData, metricsToRender]);
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-1 sm:p-2 md:p-4 lg:p-6">
-      <Box className="bg-white shadow-sm sm:shadow-md rounded-lg w-full overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8  h-full w-full my-4 mb-8">
+      <Box className="bg-white shadow-sm sm:shadow-md rounded-lg w-full overflow-x-auto">
         <div className="p-2 sm:p-4 md:p-6 border-b border-gray-200">
           <Title
             order={2}
@@ -141,13 +134,13 @@ const HeatMapTable = memo(() => {
               </Alert>
             </div>
           ) : (
-            <div className="relative overflow-x-auto">
+            <div className="relative overflow-x-auto ">
               <Table
                 highlightOnHover
                 striped
                 withTableBorder
                 withColumnBorders
-                className="w-full text-xs"
+                className="min-w-[1024px] text-xs"
                 style={{ tableLayout: 'auto' }}
               >
                 <thead className="bg-gray-50 sticky top-0 z-10">
@@ -199,7 +192,7 @@ const HeatMapTable = memo(() => {
                   {hoursOfDay.map((hour, hourIndex) => (
                     <tr
                       key={hour}
-                      className={`${hourIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150`}
+                      className={`${hourIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-colors duration-150`}
                     >
                       <td
                         style={{ ...stickyCell }}
@@ -218,16 +211,20 @@ const HeatMapTable = memo(() => {
                         );
                         return metricsToRender.map((metric, index) => {
                           const value = hourData?.[metric];
+                          const bgColor = getCellColor(
+                            value,
+                            metric,
+                            metricRanges,
+                          );
+                          const hoverStyle = {
+                            backgroundColor: 'rgba(59, 130, 246, 0.4)',
+                            color: 'white',
+                          };
                           return (
                             <td
                               key={`${day}-${hour}-${metric}`}
-                              style={{
-                                backgroundColor: getCellColor(value, metric),
-                                minWidth: 'auto',
-                                width: 'auto',
-                                maxWidth: 'none',
-                              }}
-                              className={`px-1 py-2 text-center text-xs whitespace-nowrap transition-all duration-200 hover:scale-105 cursor-default ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                              style={{ backgroundColor: bgColor }}
+                              className={`px-1 py-2 text-center text-xs whitespace-nowrap transition-all duration-200 hover:brightness-110 hover:scale-[1.2] hover:z-10 relative cursor-default ${index === 0 ? 'border-l border-gray-300' : ''}`}
                               title={
                                 value != null
                                   ? `${metricLabelMap[metric] || metric}: ${value}`
@@ -236,11 +233,7 @@ const HeatMapTable = memo(() => {
                             >
                               <div
                                 className={`truncate font-medium text-xs`}
-                                style={{
-                                  color: getTextColor(
-                                    getCellColor(value, metric),
-                                  ),
-                                }}
+                                style={{ color: getTextColor(bgColor) }}
                               >
                                 {value != null ? (
                                   <NumberFormatter
@@ -259,6 +252,29 @@ const HeatMapTable = memo(() => {
                       })}
                     </tr>
                   ))}
+                  <tr className="bg-blue-50 font-semibold">
+                    <td style={{ ...stickyCell }} className="text-xs">
+                      Total
+                    </td>
+                    {daysOfWeek.map((day) =>
+                      metricsToRender.map((metric, index) => {
+                        const total = totalRow[`${day}-${metric}`];
+                        return (
+                          <td
+                            key={`total-${day}-${metric}`}
+                            className={`text-center text-xs px-1 py-2 ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                          >
+                            <NumberFormatter
+                              value={total}
+                              thousandSeparator
+                              prefix={metric === 'cpm' ? '₹' : ''}
+                              decimalScale={2}
+                            />
+                          </td>
+                        );
+                      }),
+                    )}
+                  </tr>
                 </tbody>
               </Table>
             </div>

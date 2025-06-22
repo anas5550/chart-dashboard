@@ -1,102 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import React, { useEffect, useRef } from 'react';
 import usePerformanceMetrics from '../../hooks/usePerformanceMetrics';
 import { useMetricsContext } from '../../context/MetricsContext';
 import { Loader } from '@mantine/core';
+import { Chart, registerables } from 'chart.js';
+import {
+  CHART_COLORS,
+  X_AXIS_LABELS,
+} from './../../utils/constants/chartConstants';
+import {
+  isPercentageMetric,
+  formatTooltipLabel,
+} from './../../utils/chartUtils';
 
-// Register Chart.js components
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Tooltip,
-  Legend,
-);
+Chart.register(...registerables);
+
+///
 
 const PerformanceChart = () => {
   const { selectedMetrics } = useMetricsContext();
   const userIdentityConstant = process.env.REACT_APP_USER_IDENTITY;
 
-  const {
-    chartDataArray, // assumed you restructure API to return [{ hour: 0, ROAS: 6.4, AOV: 45.5, ... }, ...]
-    loading,
-    error,
-  } = usePerformanceMetrics(selectedMetrics, userIdentityConstant);
+  const { chartDataArray, loading, error } = usePerformanceMetrics(
+    selectedMetrics,
+    userIdentityConstant,
+  );
 
-  const [chartConfig, setChartConfig] = useState(null);
+  const canvasRef = useRef(null);
+  const chartInstanceRef = useRef(null);
 
   useEffect(() => {
-    if (!chartDataArray || chartDataArray.length === 0) return;
+    if (!chartDataArray || !canvasRef.current) return;
 
-    const hours = [0, 2, 4, 6, 8, 10, 12];
-    const labels = hours.map((h) => `${h}Hr`);
-    const datasets = selectedMetrics.map((metric, index) => {
-      const isPercentage = ['cr', 'ctr', 'rate', 'acos'].some((k) =>
-        metric.toLowerCase().includes(k),
-      );
-      const color = [
-        '#6366F1',
-        '#10B981',
-        '#F59E0B',
-        '#EF4444',
-        '#8B5CF6',
-        '#3B82F6',
-        '#EC4899',
-        '#22D3EE',
-      ][index % 8];
+    // Destroy previous chart instance if exists
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+      chartInstanceRef.current = null;
+    }
 
-      return {
-        label: metric,
-        data: chartDataArray.map((d) => d[metric]),
-        borderColor: color,
-        backgroundColor: color,
-        yAxisID: isPercentage ? 'percentage' : 'monetary',
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      };
-    });
+    const datasets = selectedMetrics.map((metric, index) => ({
+      label: metric,
+      data: chartDataArray.map((entry) => entry[metric]),
+      borderColor: CHART_COLORS[index % CHART_COLORS.length],
+      backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
+      yAxisID: isPercentageMetric(metric) ? 'percentage' : 'monetary',
+      tension: 0.4,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+    }));
 
-    setChartConfig({
+    const ctx = canvasRef.current.getContext('2d');
+    const newChart = new Chart(ctx, {
+      type: 'line',
       data: {
-        labels,
+        labels: X_AXIS_LABELS,
         datasets,
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false,
+        layout: {
+          padding: {
+            bottom: 20,
+          },
         },
+        interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: { font: { size: 12 } },
+            display: false,
+            // position: 'bottom',
+            // labels: { font: { size: 12 } },
           },
           tooltip: {
             callbacks: {
-              label: (ctx) => {
-                const value = ctx.raw;
-                const isPercent = ['cr', 'ctr', 'rate', 'acos'].some((k) =>
-                  ctx.dataset.label.toLowerCase().includes(k),
-                );
-                if (isPercent)
-                  return `${ctx.dataset.label}: ${value.toFixed(2)}%`;
-                if (value > 100)
-                  return `${ctx.dataset.label}: ₹${value.toLocaleString()}`;
-                return `${ctx.dataset.label}: ${value}`;
-              },
+              label: formatTooltipLabel,
             },
           },
         },
@@ -126,31 +102,46 @@ const PerformanceChart = () => {
           x: {
             ticks: {
               font: { size: 12 },
+              maxRotation: 0,
+              autoSkip: true,
             },
           },
         },
       },
     });
+
+    chartInstanceRef.current = newChart;
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+    };
   }, [chartDataArray, selectedMetrics]);
 
-  if (loading)
+  if (loading || (!chartDataArray?.length && !error)) {
     return (
-      <div className="flex justify-center items-center h-96">
+      <div className="flex justify-center items-center h-[25rem] bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full">
         <Loader size="lg" color="blue" />
       </div>
     );
-  if (error) return <div>Error: {error}</div>;
-  if (!chartConfig) return <div>No data</div>;
+  }
+
+  if (error)
+    return <div className="text-red-600 text-sm text-center">{error}</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full h-96">
-      <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
-        Performance Chart
-      </h2>
-      <p className="text-sm text-gray-500 mb-4">
-        Key Metrics for Dayparting Schedule Performance Evaluation
-      </p>
-      <Line data={chartConfig.data} options={chartConfig.options} />
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full h-[25rem] overflow-hidden">
+      <div className="h-full w-full transform scale-[0.85] sm:scale-100 origin-top">
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+          Performance Chart
+        </h2>
+        <p className="text-sm text-gray-500 mb-2">
+          Key Metrics for Dayparting Schedule Performance Evaluation
+        </p>
+        <canvas className="pb-6" ref={canvasRef}></canvas>
+      </div>
     </div>
   );
 };
