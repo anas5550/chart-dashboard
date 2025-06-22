@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../utils/services/api'; // Assuming your api.js is in utils/services
+import api from '../services/api';
 
 const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
   const [chartDataArray, setChartDataArray] = useState([]);
@@ -14,7 +14,6 @@ const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
       setApiResponseMessage('');
       setChartDataArray([]);
 
-      // If no metrics are selected, don't make an API call
       if (!selectedMetrics || selectedMetrics.length === 0) {
         setLoading(false);
         setError('No metrics selected for the chart.');
@@ -25,23 +24,21 @@ const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
         const response = await api.post(
           '/day-parting/DayPartingPerformanceGraphList',
           {
-            startDate: '2024-06-08', // Hardcoded dates for the API request
+            startDate: '2024-06-08',
             endDate: '2024-07-07',
-            metrics: selectedMetrics, // Pass selected metrics to the API
+            metrics: selectedMetrics,
           },
           {
             headers: {
-              'X-USER-IDENTITY': userIdentityConstant, // Use the provided user identity
+              'X-USER-IDENTITY': userIdentityConstant,
             },
           },
         );
 
-        // Store and display any message from the API response
         if (response.data && response.data.message) {
           setApiResponseMessage(response.data.message);
         }
 
-        // Process the API result to transform it into chart-compatible data
         if (
           response.data &&
           response.data.result &&
@@ -52,9 +49,8 @@ const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
 
           if (categories.length > 0 && series.length > 0) {
             const transformedData = categories.map((category, index) => {
-              const dataPoint = { date: category }; // 'date' for X-axis
+              const dataPoint = { date: category };
               series.forEach((s) => {
-                // Only include data for metrics that are currently selected
                 if (
                   selectedMetrics.includes(s.name) &&
                   s.data &&
@@ -80,7 +76,6 @@ const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
           );
         }
       } catch (err) {
-        // Handle various types of errors from the API call
         if (err.response) {
           setError(
             err.response.data.message ||
@@ -107,20 +102,18 @@ const usePerformanceMetrics = (selectedMetrics, userIdentityConstant) => {
         }
         setChartDataArray([]);
       } finally {
-        setLoading(false); // Always set loading to false after attempt
+        setLoading(false);
       }
     };
 
-    // Only trigger data fetching if selectedMetrics are available
     if (selectedMetrics && selectedMetrics.length > 0) {
       fetchMetricsData();
     } else {
-      // If no metrics are selected, stop loading and clear existing chart data/messages
       setLoading(false);
       setChartDataArray([]);
       setApiResponseMessage('');
     }
-  }, [selectedMetrics, userIdentityConstant]); // Dependencies: re-run when selectedMetrics or userIdentityConstant changes
+  }, [selectedMetrics, userIdentityConstant]);
 
   return { chartDataArray, loading, error, apiResponseMessage };
 };

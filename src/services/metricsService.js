@@ -1,4 +1,4 @@
-import api from '../utils/services/api';
+import api from './../services/api';
 
 export const fetchMetricsList = async (userIdentityConstant, signal) => {
   try {

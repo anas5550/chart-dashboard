@@ -1,6 +1,6 @@
 import Login from '../pages/auth/Login';
-import Dashboard from '../pages/Dashboard';
-import NotFound from '../pages/NotFound';
+import Dashboard from './../pages/Dashboard/Dashboard';
+import NotFound from './../pages/NotFound/NotFound';
 
 const routesConfig = [
   {

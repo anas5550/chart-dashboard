@@ -48,9 +48,7 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {/* Formik's isSubmitting prop should now be mapped to isLoading from your hook */}
           {() => (
-            // Removed isSubmitting from destructuring here
             <Form className="space-y-6">
               <div>
                 <label

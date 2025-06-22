@@ -1,20 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import usePerformanceMetrics from '../../hooks/usePerformanceMetrics';
 import { useMetricsContext } from '../../context/MetricsContext';
-import { Loader } from '@mantine/core';
+import { Center, Loader, Text } from '@mantine/core';
 import { Chart, registerables } from 'chart.js';
 import {
   CHART_COLORS,
   X_AXIS_LABELS,
-} from './../../utils/constants/chartConstants';
-import {
-  isPercentageMetric,
-  formatTooltipLabel,
-} from './../../utils/chartUtils';
+} from '../../utils/constants/chartConstants';
+import { isPercentageMetric, formatTooltipLabel } from '../../utils/chartUtils';
 
 Chart.register(...registerables);
-
-///
 
 const PerformanceChart = () => {
   const { selectedMetrics } = useMetricsContext();
@@ -31,7 +26,6 @@ const PerformanceChart = () => {
   useEffect(() => {
     if (!chartDataArray || !canvasRef.current) return;
 
-    // Destroy previous chart instance if exists
     if (chartInstanceRef.current) {
       chartInstanceRef.current.destroy();
       chartInstanceRef.current = null;
@@ -120,14 +114,6 @@ const PerformanceChart = () => {
     };
   }, [chartDataArray, selectedMetrics]);
 
-  if (loading || (!chartDataArray?.length && !error)) {
-    return (
-      <div className="flex justify-center items-center h-[25rem] bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full">
-        <Loader size="lg" color="blue" />
-      </div>
-    );
-  }
-
   if (error)
     return <div className="text-red-600 text-sm text-center">{error}</div>;
 
@@ -140,7 +126,19 @@ const PerformanceChart = () => {
         <p className="text-sm text-gray-500 mb-2">
           Key Metrics for Dayparting Schedule Performance Evaluation
         </p>
-        <canvas className="pb-6" ref={canvasRef}></canvas>
+
+        {loading || (!chartDataArray?.length && !error) ? (
+          <Center className="h-48 sm:h-64 md:h-80 p-4">
+            <div className="flex flex-col items-center space-y-2">
+              <Loader size="md" />
+              <Text className="text-xs sm:text-sm text-gray-600">
+                Loading Performance Chart...
+              </Text>
+            </div>
+          </Center>
+        ) : (
+          <canvas className="pb-6" ref={canvasRef}></canvas>
+        )}
       </div>
     </div>
   );

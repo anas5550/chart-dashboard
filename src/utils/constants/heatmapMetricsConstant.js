@@ -1,9 +1,3 @@
-// export const heatmapMetrics = [
-//   { label: 'CPC', value: 'CPC' },
-//   { label: 'CR%', value: 'CR_perc' },
-//   { label: 'ROAS', value: 'ROAS' },
-// ];
-
 export const heatmapMetrics = [
   { value: 'Spend', label: 'Spend' },
   { value: 'Revenue', label: 'Revenue' },

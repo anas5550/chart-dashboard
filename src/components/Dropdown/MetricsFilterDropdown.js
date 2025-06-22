@@ -83,7 +83,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
         onOptionSubmit={handleOptionToggle}
         withinPortal
         position="bottom-end"
-        className="!w-full sm:!w-72 bg-white rounded-xl shadow-xl border border-gray-300"
+        className="!w-full sm:!w-72 bg-white rounded-md shadow-md border border-black"
       >
         <Combobox.Target>
           <InputBase
@@ -93,7 +93,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
             pointer
             rightSection={<Combobox.Chevron />}
             rightSectionPointerEvents="none"
-            className="w-full sm:w-72"
+            className="w-full sm:w-72 "
             size="md"
             radius="md"
             variant="filled"
@@ -111,7 +111,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
         >
           {(styles) => (
             <Combobox.Dropdown
-              className="w-full sm:w-72 bg-white rounded-xl shadow-xl border border-gray-300"
+              className="w-full sm:w-72 bg-white rounded-xl shadow-xl border border-gray-300 "
               style={{ maxWidth: '100vw', overflowWrap: 'break-word' }}
             >
               <Combobox.Search
