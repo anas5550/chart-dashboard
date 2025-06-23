@@ -13,8 +13,13 @@ const useLogin = () => {
     setIsLoading(true);
 
     try {
-      const { token, userIdentity } = await loginUser(values, setFieldError);
-
+      const { token, userIdentity, fullName, userDetails } = await loginUser(
+        values,
+        setFieldError,
+      );
+      if (userDetails?.fullName) {
+        localStorage.setItem('userFullName', userDetails.fullName);
+      }
       if (token) {
         localStorage.setItem('authToken', token);
         setAuthToken(token);
@@ -24,6 +29,11 @@ const useLogin = () => {
         localStorage.setItem('userIdentity', userIdentity);
       }
 
+      if (fullName) {
+        localStorage.setItem('userFullName', fullName);
+      }
+
+      console.log('Login success. Redirecting...');
       setTimeout(() => {
         navigate('/');
       }, 1500);

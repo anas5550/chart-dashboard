@@ -5,6 +5,7 @@ const useLogout = () => {
   // we can write our logout logic here
   const logout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userFullName');
     navigate('/login');
   };
 

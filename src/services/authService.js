@@ -1,41 +1,31 @@
-import api from './api';
+// src/services/authService.js
+import api from './api'; // axios instance
 
-export const loginUser = async (values, setFieldError) => {
+export const loginUser = async ({ email, password }) => {
   try {
     const response = await api.post('/auth/login', {
-      email: values.email,
-      password: values.password,
+      email,
+      password,
       isLoggedInHere: 0,
     });
 
-    const token =
-      response.data.token || response.data.accessToken || response.data.jwt;
+    const { token, userDetails } = response.data;
 
-    const userIdentity =
-      response.data.userIdentity ||
-      response.data.xIdentity ||
-      response.data.your_user_identity_field;
-
-    if (!token) {
-      throw 'Login successful, but no authentication token was received.';
+    if (!token || !userDetails) {
+      throw new Error('Invalid login response structure');
     }
 
-    return { token, userIdentity };
+    return { token, userDetails };
   } catch (err) {
     if (err.response) {
-      const resData = err.response.data;
-
-      if (resData.errors) {
-        if (resData.errors.email) setFieldError('email', resData.errors.email);
-        if (resData.errors.password)
-          setFieldError('password', resData.errors.password);
-      }
-
-      throw resData.message || 'Invalid credentials. Please try again.';
-    } else if (err.request) {
-      throw 'Network error. Please check your connection and try again.';
-    } else {
-      throw 'An unexpected error occurred. Please try again.';
+      const message = err.response.data?.message || 'Invalid credentials';
+      const errors = err.response.data?.errors || {};
+      const fieldErrors = {};
+      if (errors.email) fieldErrors.email = errors.email;
+      if (errors.password) fieldErrors.password = errors.password;
+      throw { message, fieldErrors };
     }
+
+    throw new Error('Network error or unexpected issue');
   }
 };

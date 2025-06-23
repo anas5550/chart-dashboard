@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FiUser, FiLogOut } from 'react-icons/fi';
 import { BsFullscreen, BsFullscreenExit } from 'react-icons/bs';
 import { toggleFullscreen } from '../../utils/toggleFullscreen';
+import { Avatar, Text } from '@mantine/core';
 import useLogout from '../../hooks/useLogout';
 
 const Navbar = ({ sidebarExpanded }) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [fullName, setFullName] = useState('');
   const logOut = useLogout();
+
+  useEffect(() => {
+    const nameFromStorage = localStorage.getItem('userFullName');
+    if (nameFromStorage) {
+      setFullName(nameFromStorage);
+    } else {
+      setFullName('TS');
+    }
+  }, []);
+
+  const initial = fullName?.charAt(0).toUpperCase() || 'Hello, User';
 
   return (
     <nav
@@ -43,13 +56,22 @@ const Navbar = ({ sidebarExpanded }) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg py-2 text-sm z-50">
-              <div className="px-4 py-2 font-semibold text-gray-800 border-b">
-                Anas Siddiqui
+            <div className="absolute right-0 mt-2 w-52 bg-white rounded shadow-lg py-2 text-sm z-50 border border-gray-100">
+              <div className="px-4 pb-2">
+                <div className="flex items-center space-x-3 py-2">
+                  <Avatar radius="xl" color="blue" size="md">
+                    {initial}
+                  </Avatar>
+                  <Text className="font-medium text-gray-800 truncate">
+                    {fullName}
+                  </Text>
+                </div>
+                <hr className="border-t border-gray-200 mt-2" />
               </div>
+
               <button
                 onClick={() => logOut()}
-                className="w-full flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100"
+                className="w-full flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 transition"
               >
                 <FiLogOut className="mr-2" />
                 Logout
