@@ -24,7 +24,7 @@ import {
   formatHour,
 } from '../../utils/heatmapUtils';
 
-const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY;
+const HEATMAP_USER_IDENTITY = process.env.REACT_APP_USER_IDENTITY; /// .env unique user identity
 
 const HeatMapTable = memo(() => {
   const { selectedMetrics } = useMetricsContext();
@@ -55,7 +55,6 @@ const HeatMapTable = memo(() => {
   const stickyCell = {
     position: 'sticky',
     left: 0,
-    // zIndex: 20,
     backgroundColor: 'white',
     borderRight: '1px solid var(--mantine-color-gray-2)',
     boxShadow: '2px 0 4px rgba(0,0,0,0.05)',
@@ -100,9 +99,9 @@ const HeatMapTable = memo(() => {
         <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
           Heat Map
         </h2>
-        <Text className="text-sm text-gray-500 mb-2">
+        <p className="text-sm text-gray-500 mb-2">
           Day-Parting Hourly Breakdown
-        </Text>
+        </p>
       </div>
 
       <div className="relative">

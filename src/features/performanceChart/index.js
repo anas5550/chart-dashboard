@@ -61,8 +61,6 @@ const PerformanceChart = () => {
         plugins: {
           legend: {
             display: false,
-            // position: 'bottom',
-            // labels: { font: { size: 12 } },
           },
           tooltip: {
             callbacks: {
@@ -120,7 +118,7 @@ const PerformanceChart = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full h-[25rem] overflow-hidden">
       <div className="h-full w-full transform scale-[0.85] sm:scale-100 origin-top">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-1">
           Performance Chart
         </h2>
         <p className="text-sm text-gray-500 mb-2">

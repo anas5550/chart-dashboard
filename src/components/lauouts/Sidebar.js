@@ -3,7 +3,7 @@ import { Button } from '@mantine/core';
 import { AiOutlineDashboard, AiFillDashboard } from 'react-icons/ai';
 import { FaCog } from 'react-icons/fa';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ logoSrc }) => {
   const [sidebarHovered, setSidebarHovered] = useState(false);
@@ -45,7 +45,8 @@ const Sidebar = ({ logoSrc }) => {
         >
           <Button
             fullWidth
-            onClick={() => navigate('/dashboard')}
+            component={Link}
+            to="/"
             leftSection={
               dashboardHover ? (
                 <AiFillDashboard size={20} />
