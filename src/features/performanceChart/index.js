@@ -8,6 +8,7 @@ import {
   X_AXIS_LABELS,
 } from '../../utils/constants/chartConstants';
 import { isPercentageMetric, formatTooltipLabel } from '../../utils/chartUtils';
+import MetricsFilterDropdown from '../../components/Dropdown/MetricsFilterDropdown';
 
 Chart.register(...registerables);
 
@@ -116,14 +117,23 @@ const PerformanceChart = () => {
     return <div className="text-red-600 text-sm text-center">{error}</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 w-full h-[25rem] overflow-hidden">
-      <div className="h-full w-full transform scale-[0.85] sm:scale-100 origin-top">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-1">
-          Performance Chart
-        </h2>
-        <p className="text-sm text-gray-500 mb-2">
-          Key Metrics for Dayparting Schedule Performance Evaluation
-        </p>
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 lg:p-10 w-full h-[28rem] overflow-hidden my-4">
+      <div className="h-full w-full transform scale-[0.80] sm:scale-100 origin-top">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-4">
+          <div>
+            <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
+              Performance Chart
+            </h2>
+            <p className="text-sm text-gray-500">
+              Key Metrics for Dayparting Schedule Performance Evaluation
+            </p>
+          </div>
+
+          {/* Embedded Dropdown with line chart at the right side */}
+          <div className="w-full sm:w-auto">
+            <MetricsFilterDropdown />
+          </div>
+        </div>
 
         {loading || (!chartDataArray?.length && !error) ? (
           <Center className="h-48 sm:h-64 md:h-80 p-4">
@@ -135,7 +145,7 @@ const PerformanceChart = () => {
             </div>
           </Center>
         ) : (
-          <canvas className="pb-6" ref={canvasRef}></canvas>
+          <canvas className="pb-4" ref={canvasRef}></canvas>
         )}
       </div>
     </div>

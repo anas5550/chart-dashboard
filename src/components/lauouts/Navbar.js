@@ -29,7 +29,7 @@ const Navbar = ({ sidebarExpanded }) => {
         sidebarExpanded ? 'ml-64' : 'ml-16'
       } w-[calc(100%-4rem)]`}
     >
-      <h3 className="text-md font-semibold text-gray-800">Dashboard</h3>
+      <h3 className="text-md font-bold text-gray-800">Dashboard</h3>
 
       <div className="flex items-center space-x-4 relative">
         {/* Fullscreen toggle */}
@@ -59,7 +59,12 @@ const Navbar = ({ sidebarExpanded }) => {
             <div className="absolute right-0 mt-2 w-52 bg-white rounded shadow-lg py-2 text-sm z-50 border border-gray-100">
               <div className="px-4 pb-2">
                 <div className="flex items-center space-x-3 py-2">
-                  <Avatar radius="xl" color="blue" size="md">
+                  <Avatar
+                    radius="xl"
+                    color="#2a4dd8"
+                    size="md"
+                    variant="filled"
+                  >
                     {initial}
                   </Avatar>
                   <Text className="font-medium text-gray-800 truncate">

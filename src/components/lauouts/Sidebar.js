@@ -84,7 +84,7 @@ const Sidebar = ({ logoSrc, brand_icon }) => {
           <div className="p-4">
             <hr className="mb-3 border-gray-200" />
             <button
-              onClick={() => navigate('/settings')}
+              // onClick={() => navigate('/settings')}
               className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <FaCog size={18} />

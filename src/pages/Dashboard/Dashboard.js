@@ -9,7 +9,7 @@ const Dashboard = () => {
   return (
     <MetricsProvider>
       <MainLayout>
-        <MetricsFilterDropdown />
+        {/* <MetricsFilterDropdown /> */}
         <PerformanceChart />
         <HeatMapTable />
       </MainLayout>

@@ -77,13 +77,13 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
   }, [combobox.dropdownOpened]);
 
   return (
-    <div className="w-full sm:w-auto ml-auto my-4 px-4 sm:px-0 flex justify-end">
+    <div className="w-full sm:w-auto sm:px-0 flex justify-end ">
       <Combobox
         store={combobox}
         onOptionSubmit={handleOptionToggle}
         withinPortal
         position="bottom-end"
-        className="!w-full sm:!w-72 bg-white rounded-md shadow-md border border-black"
+        className="!w-full sm:!w-72 bg-white rounded-md shadow-md border border-gray-900"
       >
         <Combobox.Target>
           <InputBase
@@ -97,7 +97,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
             size="md"
             radius="md"
             variant="filled"
-            color="violet"
+            color="blue"
           >
             <span className="text-gray-700">Select metrics</span>
           </InputBase>
@@ -130,7 +130,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
                           label={item.label}
                           pointer
                           size="sm"
-                          color="violet"
+                          color="blue"
                           readOnly
                         />
                       </Group>
@@ -155,7 +155,7 @@ const MetricsFilterDropdown = ({ initialAppliedMetrics }) => {
                     wasApplied.current = true;
                     combobox.closeDropdown();
                   }}
-                  className="w-1/2 text-sm bg-violet-600 hover:bg-violet-700 text-white rounded px-3 py-1.5"
+                  className="w-1/2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded px-3 py-1.5"
                 >
                   Apply
                 </button>
