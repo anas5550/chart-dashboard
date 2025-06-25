@@ -2,6 +2,9 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import useLogin from '../../hooks/useLogin';
+import login_background_image from '../../assets/login_background_image.png';
+import { Link } from 'react-router-dom';
+import LOGO from '../../assets/logo.png';
 
 const Login = () => {
   const { login, loginError, authToken, isLoading } = useLogin();
@@ -11,11 +14,6 @@ const Login = () => {
     password: '',
     rememberMe: false,
   };
-  // const initialValues = {
-  //   email: 'test@dev.com',
-  //   password: '#Test@123',
-  //   rememberMe: false,
-  // };
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -32,14 +30,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-xl border border-gray-200">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
-          Welcome Back
+    <div
+      className="min-h-screen w-full bg-cover bg-center flex flex-col items-center justify-center px-4"
+      style={{ backgroundImage: `url(${login_background_image})` }}
+    >
+      <img src={LOGO} alt="Logo" className="h-16 mb-6" />
+
+      <div className="w-full max-w-md bg-white bg-opacity-90 p-8 rounded-xl shadow-lg">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-center text-gray-800 mb-6">
+          Welcome Back!
         </h1>
-        <p className="text-sm text-center text-gray-500 mb-6">
-          Sign In to Your Account
-        </p>
 
         <Formik
           initialValues={initialValues}
@@ -47,19 +47,20 @@ const Login = () => {
           onSubmit={handleSubmit}
         >
           {() => (
-            <Form className="space-y-6">
+            <Form className="space-y-5">
+              {/* Email Field */}
               <div>
                 <label
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Email Address
+                  Email
                 </label>
                 <Field
                   type="email"
                   name="email"
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+                  placeholder="test@dev.com"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-violet-500 outline-none"
                 />
                 <ErrorMessage
                   name="email"
@@ -68,19 +69,30 @@ const Login = () => {
                 />
               </div>
 
-              <div>
+              {/* Password Field with Forgot */}
+              <div className="relative">
                 <label
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Password
                 </label>
-                <Field
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-                />
+
+                <div className="relative">
+                  <Field
+                    type="password"
+                    name="password"
+                    placeholder="••••••••"
+                    className="w-full pr-28 pl-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-violet-500 outline-none"
+                  />
+                  <Link
+                    // to="/forgot-password"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-red-600 hover:underline"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+
                 <ErrorMessage
                   name="password"
                   component="div"
@@ -88,36 +100,39 @@ const Login = () => {
                 />
               </div>
 
+              {/* Remember Me */}
               <div className="flex items-center text-sm text-gray-700 justify-end">
                 <Field
                   type="checkbox"
                   name="rememberMe"
                   id="rememberMe"
-                  className="h-4 w-4 mr-2 text-blue-600"
+                  className="h-4 w-4 mr-2"
                 />
                 <label htmlFor="rememberMe" className="cursor-pointer">
-                  Remember me
+                  Remember Me
                 </label>
               </div>
 
+              {/* Error & Success Messages */}
               {loginError?.message && (
-                <div className="text-sm text-red-700 bg-red-100 p-3 rounded-md text-center border border-red-200">
+                <div className="text-sm text-red-700 bg-red-100 border border-red-200 p-2 rounded text-center">
                   {loginError.message}
                 </div>
               )}
 
               {authToken && (
-                <div className="text-sm text-green-700 bg-green-100 border border-green-200 p-2 rounded-md text-center">
+                <div className="text-sm text-green-700 bg-green-100 border border-green-200 p-2 rounded text-center">
                   Login successful! Redirecting...
                 </div>
               )}
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading || authToken}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-semibold transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-[#5932EA] hover:bg-[#5905EA] text-white text-sm font-semibold py-2.5 rounded-md transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Logging in...' : 'Sign In'}
+                {isLoading ? 'Logging in...' : 'SIGN IN'}
               </button>
             </Form>
           )}
