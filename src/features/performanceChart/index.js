@@ -136,16 +136,16 @@ const PerformanceChart = () => {
         </div>
 
         {loading || (!chartDataArray?.length && !error) ? (
-          <Center className="h-48 sm:h-64 md:h-80 p-4">
+          <div className="flex items-center justify-center h-[16rem] sm:h-[24rem] md:h-[22rem]">
             <div className="flex flex-col items-center space-y-2">
               <Loader size="md" />
               <Text className="text-xs sm:text-sm text-gray-600">
                 Loading Performance Chart...
               </Text>
             </div>
-          </Center>
+          </div>
         ) : (
-          <canvas className="pb-4" ref={canvasRef}></canvas>
+          <canvas className="pb-6" ref={canvasRef}></canvas>
         )}
       </div>
     </div>
