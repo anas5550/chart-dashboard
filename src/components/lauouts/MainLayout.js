@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import PropTypes from 'prop-types';
-import LOGO from '../../assets/logo.svg';
+import LOGO from '../../assets/logo.png';
+import BRAND_ICON from '../../assets/brand_icon.svg';
 
 const Layout = ({ children }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -12,6 +13,7 @@ const Layout = ({ children }) => {
       {/* Sidebar goes from top to bottom */}
       <Sidebar
         logoSrc={LOGO}
+        brand_icon={BRAND_ICON}
         onHoverChange={setSidebarExpanded} // optional if lifting hover
       />
 
