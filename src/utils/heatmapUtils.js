@@ -10,23 +10,49 @@ export const formatHour = (hourString) => {
   return hour < 12 ? `${hour}am` : `${hour - 12}pm`;
 };
 
-/**
- * Return cell background color based on value and metric.
- */
+//  Return cell background color based on value and metric.
+
 export const getCellColor = (value, metric, metricRanges) => {
   const range = metricRanges[metric];
-  if (!range || value == null || isNaN(value)) return 'rgb(240,240,240)';
-  if (range.min === range.max) return 'rgb(200,200,200)';
+  if (!range || value == null || isNaN(value)) return '#f0f0f0';
+  if (range.min === range.max) return '#d0d0d0';
 
   const normalized = (value - range.min) / (range.max - range.min);
   const isReversed = reverseMetrics.includes(metric);
-  const factor = isReversed ? 1 - normalized : normalized;
+  const t = isReversed ? 1 - normalized : normalized;
 
-  const r = Math.round(255 * (1 - factor));
-  const g = Math.round(255 * (1 - factor));
-  const b = Math.round(100 + 100 * factor);
+  const interpolateColor = (t) => {
+    const colorStops = [
+      { stop: 0, color: [249, 214, 235] }, // #f9d6eb
+      { stop: 0.5, color: [192, 134, 244] }, // #c086f4
+      { stop: 1, color: [100, 181, 246] }, // #64b5f6
+    ];
 
-  return `rgb(${r},${g},${b})`;
+    let start = colorStops[0];
+    let end = colorStops[2];
+    for (let i = 0; i < colorStops.length - 1; i++) {
+      if (t >= colorStops[i].stop && t <= colorStops[i + 1].stop) {
+        start = colorStops[i];
+        end = colorStops[i + 1];
+        break;
+      }
+    }
+
+    const localT = (t - start.stop) / (end.stop - start.stop);
+    const r = Math.round(
+      start.color[0] + localT * (end.color[0] - start.color[0]),
+    );
+    const g = Math.round(
+      start.color[1] + localT * (end.color[1] - start.color[1]),
+    );
+    const b = Math.round(
+      start.color[2] + localT * (end.color[2] - start.color[2]),
+    );
+
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  return interpolateColor(t);
 };
 
 /**

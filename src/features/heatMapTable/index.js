@@ -50,6 +50,9 @@ const HeatMapTable = memo(() => {
     paddingLeft: '0.75rem',
     paddingRight: '0.75rem',
     backgroundClip: 'padding-box',
+    minWidth: '60px',
+    maxWidth: '80px',
+    textAlign: 'center',
   };
 
   const stickyCell = {
@@ -61,6 +64,9 @@ const HeatMapTable = memo(() => {
     paddingLeft: '0.75rem',
     paddingRight: '0.75rem',
     backgroundClip: 'padding-box',
+    minWidth: '60px',
+    maxWidth: '80px',
+    textAlign: 'center',
   };
 
   const metricsToRender = selectedMetrics?.length
@@ -96,12 +102,10 @@ const HeatMapTable = memo(() => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-4 h-full w-full my-4 mb-8">
       <div className="p-2 sm:p-4 md:p-6 border-b border-gray-200">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
           Heat Map
         </h2>
-        <p className="text-sm text-gray-500 mb-2">
-          Day-Parting Hourly Breakdown
-        </p>
+        <p className="text-sm text-gray-500">Day-Parting Hourly Breakdown</p>
       </div>
 
       <div className="relative">
@@ -138,8 +142,13 @@ const HeatMapTable = memo(() => {
               style={{ tableLayout: 'auto' }}
             >
               <thead className="bg-gray-50 sticky top-0 z-10">
-                <tr>
-                  <th style={{ ...stickyHeader }}>Time</th>
+                <tr className="bg-gray-100">
+                  <th
+                    style={{ ...stickyHeader }}
+                    className="text-xs text-left font-semibold text-gray-700"
+                  >
+                    Time
+                  </th>
                   {daysOfWeek.map((day) => (
                     <th
                       key={day}
@@ -153,6 +162,7 @@ const HeatMapTable = memo(() => {
                     </th>
                   ))}
                 </tr>
+
                 <tr className="bg-gray-100">
                   <th style={{ ...stickyHeader }}></th>
                   {daysOfWeek.map((day) =>
@@ -214,7 +224,7 @@ const HeatMapTable = memo(() => {
                           <td
                             key={`${day}-${hour}-${metric}`}
                             style={{ backgroundColor: bgColor }}
-                            className={`px-1 py-2 text-center text-xs whitespace-nowrap transition-all duration-200 hover:brightness-110 hover:scale-[1.2] hover:z-10 relative cursor-default ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                            className={`transition-transform duration-200 relative hover:z-10 cursor-default hover:brightness-110 md:hover:scale-[1.05] text-center`}
                             title={
                               value != null
                                 ? `${metricLabelMap[metric] || metric}: ${value}`
