@@ -26,12 +26,10 @@ const Sidebar = ({ logoSrc, brand_icon }) => {
 
   return (
     <>
-      {/* Mini Sidebar */}
       <aside
         className="fixed top-0 left-0 h-screen w-16 bg-white shadow-md z-40 flex flex-col justify-between items-center py-4"
         onMouseEnter={() => window.innerWidth >= 640 && setHovered(true)}
       >
-        {/* Click handler on button for mobile */}
         <button
           onClick={() => window.innerWidth < 640 && setHovered(true)}
           className="absolute inset-0 w-full h-full bg-transparent border-none p-0 m-0 cursor-pointer z-10"
@@ -106,8 +104,8 @@ const Sidebar = ({ logoSrc, brand_icon }) => {
           <div>
             <hr className="mb-3 border-gray-200" />
             <Link
-              to="/settings"
-              className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+              // to="/settings"
+              className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors rounded-md"
             >
               <FaCog size={18} />
               <span className="ml-3">Settings</span>
