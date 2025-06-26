@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineDashboard, AiFillDashboard } from 'react-icons/ai';
 import { FaCog } from 'react-icons/fa';
@@ -7,6 +7,23 @@ import PropTypes from 'prop-types';
 const Sidebar = ({ logoSrc, brand_icon }) => {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const fullSidebarRef = useRef(null);
+
+  // Close sidebar on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        hovered &&
+        fullSidebarRef.current &&
+        !fullSidebarRef.current.contains(event.target)
+      ) {
+        setHovered(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [hovered]);
 
   return (
     <>
@@ -51,6 +68,7 @@ const Sidebar = ({ logoSrc, brand_icon }) => {
       </aside>
 
       <aside
+        ref={fullSidebarRef}
         className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-50 transition-all duration-300 ease-in-out transform ${
           hovered ? 'translate-x-0' : '-translate-x-full'
         }`}
