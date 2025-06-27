@@ -100,8 +100,8 @@ const HeatMapTable = memo(() => {
   }, [heatmapData, metricsToRender]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-4 h-full w-full my-4 mb-8">
-      <div className="p-2 sm:p-4 md:p-6 border-b border-gray-200">
+    <div className="bg-white rounded-lg shadow-md p-2 sm:p-3 lg:p-4 h-full w-full my-4 mb-8">
+      <div className="p-2 sm:p-3 md:p-4 border-b border-gray-200">
         <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
           Heat Map
         </h2>
@@ -235,7 +235,7 @@ const HeatMapTable = memo(() => {
                             }
                           >
                             <div
-                              className="truncate font-normal text-xs px-1 py-1"
+                              className="truncate font-normal text-xs px-0.5 py-1"
                               style={{ color: getTextColor(bgColor) }}
                             >
                               {value != null ? (
