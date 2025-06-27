@@ -117,7 +117,8 @@ const PerformanceChart = () => {
     return <div className="text-red-600 text-sm text-center">{error}</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 lg:p-10 w-full h-[25rem] overflow-hidden my-4">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-6 w-full h-[25rem] overflow-hidden my-4">
+
       <div className="h-full w-full transform scale-[0.80] sm:scale-100 origin-top">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-4">
           <div>
@@ -145,7 +146,7 @@ const PerformanceChart = () => {
             </div>
           </div>
         ) : (
-          <canvas className="pb-6" ref={canvasRef}></canvas>
+          <canvas className="pb-8" ref={canvasRef}></canvas>
         )}
       </div>
     </div>

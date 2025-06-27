@@ -145,7 +145,7 @@ const HeatMapTable = memo(() => {
                 <tr className="bg-gray-100">
                   <th
                     style={{ ...stickyHeader }}
-                    className="text-xs text-left font-semibold text-gray-700"
+                    className="text-xs text-left font-normal text-gray-700"
                   >
                     Time
                   </th>
@@ -223,7 +223,10 @@ const HeatMapTable = memo(() => {
                         return (
                           <td
                             key={`${day}-${hour}-${metric}`}
-                            style={{ backgroundColor: bgColor }}
+                            style={{
+                              backgroundColor: bgColor,
+                              border: '3px solid white',
+                            }}
                             className={`transition-transform duration-200 relative hover:z-10 cursor-default hover:brightness-110 md:hover:scale-[1.05] text-center`}
                             title={
                               value != null
@@ -232,7 +235,7 @@ const HeatMapTable = memo(() => {
                             }
                           >
                             <div
-                              className={`truncate font-medium text-xs`}
+                              className="truncate font-normal text-xs px-1 py-1"
                               style={{ color: getTextColor(bgColor) }}
                             >
                               {value != null ? (
@@ -252,7 +255,7 @@ const HeatMapTable = memo(() => {
                     })}
                   </tr>
                 ))}
-                <tr className="bg-blue-50 font-semibold">
+                <tr className="bg-blue-50 font-normal">
                   <td style={{ ...stickyCell }} className="text-xs">
                     Total
                   </td>
@@ -262,7 +265,7 @@ const HeatMapTable = memo(() => {
                       return (
                         <td
                           key={`total-${day}-${metric}`}
-                          className={`text-center text-xs px-1 py-2 ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                          className={`text-center text-xs px-1 py-2 bg-gray-100 ${index === 0 ? 'border-l border-gray-300' : ''}`}
                         >
                           <NumberFormatter
                             value={total}

@@ -11,7 +11,6 @@ export const formatHour = (hourString) => {
 };
 
 //  Return cell background color based on value and metric.
-
 export const getCellColor = (value, metric, metricRanges) => {
   const range = metricRanges[metric];
   if (!range || value == null || isNaN(value)) return '#f0f0f0';
@@ -21,15 +20,23 @@ export const getCellColor = (value, metric, metricRanges) => {
   const isReversed = reverseMetrics.includes(metric);
   const t = isReversed ? 1 - normalized : normalized;
 
-  const interpolateColor = (t) => {
-    const colorStops = [
-      { stop: 0, color: [249, 214, 235] }, // #f9d6eb
-      { stop: 0.5, color: [192, 134, 244] }, // #c086f4
-      { stop: 1, color: [100, 181, 246] }, // #64b5f6
-    ];
+  // Extracted from Figma (sorted from light to strong gradient visually)
+  const colorStops = [
+    { stop: 0.0, color: [243, 235, 255] }, // #F3EBFF
+    { stop: 0.1, color: [235, 225, 255] }, // #EBE1FF
+    { stop: 0.2, color: [226, 217, 250] }, // #E2D9FA
+    { stop: 0.3, color: [231, 212, 248] }, // #E7D4F8
+    { stop: 0.4, color: [255, 217, 243] }, // #FFD9F3
+    { stop: 0.5, color: [255, 191, 235] }, // #FFBFEB
+    { stop: 0.6, color: [255, 185, 235] }, // #FFB9EB
+    { stop: 0.7, color: [144, 222, 243] }, // #90DEF3
+    { stop: 0.85, color: [113, 213, 240] }, // #71D5F0
+    { stop: 1.0, color: [22, 171, 212] }, // #16ABD4
+  ];
 
+  const interpolateColor = (t) => {
     let start = colorStops[0];
-    let end = colorStops[2];
+    let end = colorStops[colorStops.length - 1];
     for (let i = 0; i < colorStops.length - 1; i++) {
       if (t >= colorStops[i].stop && t <= colorStops[i + 1].stop) {
         start = colorStops[i];
