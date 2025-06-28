@@ -77,8 +77,8 @@ const HeatMapTable = memo(() => {
     return heatmapMetrics.reduce((acc, { label, value }) => {
       acc[value] = label;
       return acc;
-    }, {});
-  }, []);
+    }, []);
+  }, {});
 
   const totalRow = useMemo(() => {
     const totals = {};
@@ -100,15 +100,17 @@ const HeatMapTable = memo(() => {
   }, [heatmapData, metricsToRender]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-2 sm:p-3 lg:p-4 h-full w-full my-4 mb-8">
-      <div className="p-2 sm:p-3 md:p-4 border-b border-gray-200">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
+    <div className="bg-white rounded-lg shadow-md p-1 sm:p-2 md:p-4 h-full w-full my-2 sm:my-4 mb-4 sm:mb-8">
+      <div className="p-1 sm:p-2 md:p-4">
+        <h2 className="text-base sm:text-lg md:text-2xl font-semibold text-gray-800">
           Heat Map
         </h2>
-        <p className="text-sm text-gray-500">Day-Parting Hourly Breakdown</p>
+        <p className="text-xs sm:text-sm text-gray-500">
+          Day-Parting Hourly Breakdown
+        </p>
       </div>
 
-      <div className="relative">
+      <div className="relative w-full overflow-x-auto rounded-md  shadow-sm">
         {loading ? (
           <Center className="h-48 sm:h-64 md:h-80 p-4">
             <div className="flex flex-col items-center space-y-2">
@@ -132,28 +134,20 @@ const HeatMapTable = memo(() => {
             </Alert>
           </div>
         ) : (
-          <div className="relative overflow-x-auto ">
+          <div className="relative w-full overflow-x-auto">
             <Table
               highlightOnHover
-              striped
-              withTableBorder
-              withColumnBorders
-              className="min-w-[1024px] text-xs"
+              className="min-w-[700px] sm:min-w-[900px] md:min-w-[1024px] text-[10px] sm:text-xs md:text-sm"
               style={{ tableLayout: 'auto' }}
             >
-              <thead className="bg-gray-50 sticky top-0 z-10">
-                <tr className="bg-gray-100">
-                  <th
-                    style={{ ...stickyHeader }}
-                    className="text-xs text-left font-normal text-gray-700"
-                  >
-                    Time
-                  </th>
+              <thead className="bg-white sticky top-0 z-10">
+                <tr className="bg-white">
                   {daysOfWeek.map((day) => (
                     <th
                       key={day}
                       colSpan={metricsToRender.length}
-                      className="text-center border-l border-gray-300"
+                      className="text-center  text-[#9D9D9D] font-light"
+                      // sunday, monday
                     >
                       <div className="truncate">
                         <span className="hidden sm:inline">{day}</span>
@@ -162,14 +156,14 @@ const HeatMapTable = memo(() => {
                     </th>
                   ))}
                 </tr>
-
-                <tr className="bg-gray-100">
+                {/* imp clicks, cpm */}
+                <tr className="bg-white p-4">
                   <th style={{ ...stickyHeader }}></th>
                   {daysOfWeek.map((day) =>
                     metricsToRender.map((metric, index) => (
                       <th
                         key={`${day}-${metric}`}
-                        className={`text-center px-1 py-1 text-xs font-medium text-gray-600 ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                        className={`text-center px-0.5 sm:px-1 py-0.5 sm:py-1 sm:text-xs md:text-sm text-[#797979] font-normal`}
                       >
                         <div
                           className="truncate"
@@ -194,13 +188,15 @@ const HeatMapTable = memo(() => {
                 {hoursOfDay.map((hour, hourIndex) => (
                   <tr
                     key={hour}
-                    className={`${hourIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-colors duration-150`}
+                    className={`${hourIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-colors duration-150 `}
                   >
                     <td
                       style={{ ...stickyCell }}
-                      className="text-center text-xs font-medium text-gray-700"
+                      className="text-center text-[10px] sm:text-xs md:text-sm font-normal text-gray-700"
                     >
-                      <div className="truncate text-xs">{formatHour(hour)}</div>
+                      <div className="truncate text-[10px] sm:text-xs md:text-sm text-[#9D9D9D]">
+                        {formatHour(hour)}
+                      </div>
                     </td>
                     {daysOfWeek.map((day) => {
                       const currentDay = heatmapData.find(
@@ -216,18 +212,17 @@ const HeatMapTable = memo(() => {
                           metric,
                           metricRanges,
                         );
-                        const hoverStyle = {
-                          backgroundColor: 'rgba(59, 130, 246, 0.4)',
-                          color: 'white',
-                        };
                         return (
                           <td
                             key={`${day}-${hour}-${metric}`}
                             style={{
                               backgroundColor: bgColor,
                               border: '3px solid white',
+                              minWidth: 48,
+                              maxWidth: 80,
+                              padding: '0px',
                             }}
-                            className={`transition-transform duration-200 relative hover:z-10 cursor-default hover:brightness-110 md:hover:scale-[1.05] text-center`}
+                            className={`transition-transform duration-200 relative hover:z-10 cursor-default hover:brightness-110 md:hover:scale-[1.05] text-center px-0.5 sm:px-1 py-0.5 sm:py-1`}
                             title={
                               value != null
                                 ? `${metricLabelMap[metric] || metric}: ${value}`
@@ -235,7 +230,7 @@ const HeatMapTable = memo(() => {
                             }
                           >
                             <div
-                              className="truncate font-normal text-xs px-0.5 py-1"
+                              className="truncate font-normal text-[10px] sm:text-xs md:text-sm px-0.5 sm:px-1 py-0.5 sm:py-1"
                               style={{ color: getTextColor(bgColor) }}
                             >
                               {value != null ? (
@@ -256,7 +251,10 @@ const HeatMapTable = memo(() => {
                   </tr>
                 ))}
                 <tr className="bg-blue-50 font-normal">
-                  <td style={{ ...stickyCell }} className="text-xs">
+                  <td
+                    style={{ ...stickyCell }}
+                    className="text-[10px] sm:text-xs md:text-sm"
+                  >
                     Total
                   </td>
                   {daysOfWeek.map((day) =>
@@ -265,7 +263,7 @@ const HeatMapTable = memo(() => {
                       return (
                         <td
                           key={`total-${day}-${metric}`}
-                          className={`text-center text-xs px-1 py-2 bg-gray-100 ${index === 0 ? 'border-l border-gray-300' : ''}`}
+                          className={`text-center text-[10px] sm:text-xs md:text-sm px-0.5 sm:px-1 py-1 bg-gray-100 ${index === 0 ? 'border-l border-gray-300' : ''}`}
                         >
                           <NumberFormatter
                             value={total}
