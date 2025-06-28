@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/chart-dashboard/static/css/main.06fca9aa.css",
-    "main.js": "/chart-dashboard/static/js/main.55640fdc.js",
+    "main.css": "/chart-dashboard/static/css/main.a121e740.css",
+    "main.js": "/chart-dashboard/static/js/main.43ed794f.js",
     "static/js/453.ff9ce6e5.chunk.js": "/chart-dashboard/static/js/453.ff9ce6e5.chunk.js",
     "static/media/login_background_image.png": "/chart-dashboard/static/media/login_background_image.9e8f334ee40074698b46.png",
     "static/media/logo.png": "/chart-dashboard/static/media/logo.925b50daabcf5f520436.png",
     "static/media/brand_icon.svg": "/chart-dashboard/static/media/brand_icon.40e140f6e0a0c490c8e0f65b785358cd.svg",
     "index.html": "/chart-dashboard/index.html",
-    "main.06fca9aa.css.map": "/chart-dashboard/static/css/main.06fca9aa.css.map",
-    "main.55640fdc.js.map": "/chart-dashboard/static/js/main.55640fdc.js.map",
+    "main.a121e740.css.map": "/chart-dashboard/static/css/main.a121e740.css.map",
+    "main.43ed794f.js.map": "/chart-dashboard/static/js/main.43ed794f.js.map",
     "453.ff9ce6e5.chunk.js.map": "/chart-dashboard/static/js/453.ff9ce6e5.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.06fca9aa.css",
-    "static/js/main.55640fdc.js"
+    "static/css/main.a121e740.css",
+    "static/js/main.43ed794f.js"
   ]
 }
