@@ -72,5 +72,5 @@ export const getTextColor = (backgroundColor) => {
 
   // Luminance formula
   const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-  return luminance > 150 ? 'black' : 'white';
+  return luminance > 150 ? '#5932EA' : 'white';
 };
